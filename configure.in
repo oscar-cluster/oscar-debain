@@ -151,6 +151,7 @@ AC_CONFIG_FILES([
 
     dist/Makefile
     dist/programs.sh
+    dist/oscar-release.spec 
 
     doc/Makefile
 
@@ -196,8 +197,7 @@ AC_CONFIG_FILES([
     share/prereqs/XML-Simple/Makefile
     share/prereqs/XML-Simple/media/Makefile
     share/prereqs/XML-Simple/scripts/Makefile
-
-    share/serverlists/Makefile
+    share/prereqs/XML-Simple/RPMS/Makefile
 
     src/Makefile
     src/Installer/Makefile
