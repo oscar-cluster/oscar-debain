@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE package SYSTEM "../package.dtd">
+<oscar>
+
+<!--
+      Copyright (c) 2002 The Trustees of Indiana University.  
+                         All rights reserved.
+      
+      This file is part of the OSCAR software package.  For license
+      information, see the COPYING file in the top level directory of the
+      OSCAR source distribution.
+     
+      $Id$
+      -->
+
+  <name>mpich-p4</name>
+
+  <version>
+    <major>1</major>
+    <minor>2</minor>
+    <subversion>5</subversion>
+    <release>4</release>
+  </version>
+
+  <class>included</class>
+
+  <summary>MPICH specifically packaged for OSCAR clusters</summary>
+  <license>Freely distributable</license>
+  <copyright>2002</copyright>
+  <group>Development/Libraries</group>
+  <url>http://www-unix.mcs.anl.gov/mpi/mpich/</url>
+  <maintainer>
+    <name>MPICH Team</name>
+    <email>mpich-bugs@mcs.anl.gov</email>
+  </maintainer>
+  <packager>
+    <name>Jason Brechin</name>
+    <email>brechin@ncsa.uiuc.edu</email>
+  </packager>
+
+  <description>MPICH is a freely available, portable implementation of
+MPI (http://www.mpi-forum.org), the Standard for message-passing
+libraries.</description>
+
+  <rpmlist>
+    <rpm>mpich-ch_p4-gcc-oscar</rpm>
+    <rpm>mpich-ch_p4-gcc-oscar-devel</rpm>
+    <rpm>mpich-ch_p4-gcc-oscar-module</rpm>
+  </rpmlist>
+
+  <provides>
+    <type>package</type>
+    <name>mpi</name>
+  </provides>
+
+  <requires>
+    <type>package</type>
+    <name>switcher</name>
+  </requires>
+
+  <package>
+    <switcher>
+      <tag>mpi</tag>
+      <name>mpich-ch_p4-gcc-1.2.5.10</name>
+    </switcher>
+  </package>
+
+</oscar>

@@ -1,0 +1,127 @@
+#! /usr/bin/perl
+
+# Copyright 2004 NCSA
+#           Neil Gorsuch <ngorsuch@ncsa.uiuc.edu>
+# 
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+ 
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+ 
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+#   This script creates or fixes the following:
+#   creates the oscar_server node record,
+#   creates the node attribute set oscar_server,
+#   creates the node attribute set oscar_clients.
+
+use strict;
+use lib "$ENV{OSCAR_HOME}/lib";
+use OSCAR::Database;
+use OSCAR::Package;
+use oda;
+
+my %options = ();
+
+
+sub do_it_or_die {
+    my ( $command, $results_ref, $error ) = @_;
+    
+    return if dec_already_locked( $command, $results_ref, 1 );
+    database_disconnect();
+    die "$0: $error";
+}
+
+
+# see if there is already a node named oscar_server,
+# and make it if it doesn't already exist, this will also
+# make a special associated node group named oscar_server
+# and a special associated configuration named oscar_server
+
+my @nodes = ();
+print "Checking for database existance of node oscar_server ...\n";
+
+# START LOCKING FOR NEST and open the database.
+
+my @tables =("configurations", "oda_shortcuts", "node_groups", "nodes");
+my @errors = ();
+locking("write", \%options, \@tables, \@errors);
+
+do_it_or_die( "nodes name=\"oscar_server\"",
+	      \@nodes,
+	      "cannot read nodes database table" );
+if ( ! @nodes ) {
+    print "Creating node, node group, configurations records for oscar_server ...\n";
+    do_it_or_die( "create_node oscar_server",
+		  undef,
+		  "cannot create node record for oscar_server" );
+}
+
+# update some of the fields in the node record for oscar_server
+
+my $hostname = `hostname`;
+chomp $hostname;
+print "Updating the hostname field in the oscar_server node to <$hostname> ...\n";
+do_it_or_die( "modify_records nodes name=oscar_server hostname~$hostname",
+	      undef,
+	      "cannot update the hostname field in the node record for oscar_server" );
+my $dns_domain = `dnsdomainname`;
+chomp $dns_domain;
+if ( defined $dns_domain && $dns_domain ne "" ) {
+    print "Updating the dns_domain field in the oscar_server node to <$dns_domain>\n";
+    do_it_or_die( "modify_records nodes name=oscar_server dns_domain~$dns_domain",
+		  undef,
+		  "cannot update the dns_domain field in the node record for oscar_server" );
+}    
+
+# make sure that certain node groups exist
+
+foreach my $node_group_name ( "oscar_clients", "all" ) {
+    print "Checking for existance of node group $node_group_name ...\n";
+    my @node_groups = ();
+    do_it_or_die( "node_groups name=\"$node_group_name\"",
+		  \@node_groups,
+		  "cannot read node groups database table" );
+    if ( ! @node_groups ) {
+	print "Creating node group $node_group_name ...\n";
+	do_it_or_die( "create_node_group $node_group_name",
+		      undef,
+		      "cannot create node group record for $node_group_name" );
+    }
+}
+
+# make sure that certain named configurations exist
+foreach my $configuration_name ( "default" ) {
+    print "Checking for existance of configuration $configuration_name ...\n";
+    my @configurations = ();
+    do_it_or_die( "configurations name=\"$configuration_name\"",
+		  \@configurations,
+		  "cannot read configurations database table" );
+    if ( ! @configurations ) {
+	print "Creating configuration $configuration_name ...\n";
+	do_it_or_die( "create_configuration $configuration_name",
+		      undef,
+		      "cannot create configuration record for $configuration_name" );
+    }
+}
+
+# UNLOCKING FOR NEST.
+unlock(\%options, \@errors);
+
+
+exit 0;
+
+
+
+
+
+
+
+

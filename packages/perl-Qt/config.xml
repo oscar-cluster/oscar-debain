@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<oscar>
+  <!--
+      Copyright (c) 2003 NCSA
+                         All rights reserved.
+     Copyright 2004 Revolution Linux
+            Benoit des Ligneris <bdesligneris@revolutionlinux.com>
+
+      This file is part of the OSCAR software package.  For license
+      information, see the COPYING file in the top level directory of the
+      OSCAR source distribution.
+
+      $Id$
+  -->
+  <name>perl-Qt</name>
+
+
+  <version>
+    <major>3</major>
+    <minor>0</minor>
+    <subversion>6</subversion>
+    <release>6</release>
+  </version>
+
+  <class>core</class>
+
+  <summary>Qt bindings for Perl</summary>
+  <license>GPL</license>
+  <packager>
+    <name>Jason Brechin</name>
+    <email>brechin@ncsa.uiuc.edu</email>
+  </packager>
+
+  <description>Perl-Qt allows for writing Qt programs in Perl</description>
+
+  <rpmlist>
+    <filter distribution='fedora' group='oscar_server' />
+    <filter distribution='whitebox' group='oscar_server' />
+    <filter distribution='redhat' group='oscar_server' />
+    <rpm>qt</rpm>
+    <rpm>qt-devel</rpm>
+    <rpm>cups-libs</rpm>
+  </rpmlist>
+
+  <rpmlist>
+    <filter distribution='mandrake' distribution_version='9.0' group='oscar_server'/>
+    <rpm>libqt3</rpm>
+    <rpm>libqt3-devel</rpm>
+    <rpm>libunixODBC2-devel</rpm>
+    <rpm>libunixODBC2</rpm>
+    <rpm>libmysql10-devel</rpm>
+    <rpm>postgresql-devel</rpm>
+    <rpm>libcups1</rpm>
+    <rpm>perl-Qt-mdk</rpm>
+    <rpm>libmng1</rpm>
+    <rpm>liblcms1</rpm>
+    <rpm>libpgsql2</rpm>
+    <rpm>libpgperl</rpm>
+    <rpm>libecpg3</rpm>
+    <rpm>libpgsqlodbc0</rpm>
+    <rpm>postgresql</rpm>
+    <rpm>sfio</rpm>
+    <rpm>libpgtcl2</rpm>
+  </rpmlist>
+
+  <rpmlist>
+    <filter distribution='mandrake' distribution_version='10.0' group='oscar_server'/>
+    <rpm>libqt3</rpm>
+    <rpm>libcups2</rpm>
+    <rpm>perl-Qt-mdk10</rpm>
+    <rpm>libpq3</rpm>
+    <rpm>libmng1</rpm>
+    <rpm>liblcms1</rpm>
+    <rpm>libecpg3</rpm>
+    <rpm>libsmokeqt1</rpm>
+    <rpm>libMesaglut3</rpm>
+  </rpmlist>
+
+  <rpmlist>
+<!-- For distros with Perl 5.6 -->
+    <filter distribution='redhat'   distribution_version='7.3' group='oscar_server'/>
+    <filter distribution='redhat'   distribution_version='7.2' group='oscar_server'/>
+    <filter distribution='mandrake' distribution_version='8.2' group='oscar_server'/>
+    <filter distribution='rhas'   distribution_version='2.1AS' group='oscar_server'/>
+      <rpm>perl-Qt-5.6</rpm>
+  </rpmlist>
+
+  <rpmlist>
+<!-- For distros with Perl 5.8 -->
+    <filter distribution='fedora'   distribution_version='1'   group='oscar_server'/>
+    <filter distribution='fedora'   distribution_version='2'   group='oscar_server'/>
+    <filter distribution='redhat'   distribution_version='8.0' group='oscar_server'/>
+    <filter distribution='redhat'   distribution_version='9'   group='oscar_server'/>
+    <filter distribution='redhat'   distribution_version='3as'   group='oscar_server'/>
+    <filter distribution='whitebox' group='oscar_server' />
+    <filter distribution='suse' group='oscar_server'/>
+      <rpm>perl-Qt</rpm>
+  </rpmlist>
+
+  <rpmlist>
+    <filter distribution='suse' group='oscar_server'/>
+      <rpm>xdevel</rpm>
+      <rpm>qt3</rpm>
+      <rpm>qt3-devel</rpm>
+      <rpm>perl-Qt-qt3-compat</rpm>
+  </rpmlist>
+
+</oscar>

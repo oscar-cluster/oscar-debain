@@ -1,0 +1,146 @@
+#! /usr/bin/perl
+
+# Copyright 2003 NCSA
+#           Neil Gorsuch <ngorsuch@ncsa.uiuc.edu>
+# Copyright 2004 Revolution Linux
+#           Benoit des Ligneris <bdesligneris@revolutionlinux.com>
+#
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+ 
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+ 
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+#   This script initializes or re-initializes the values in the database
+#   table "oscar" which is for global values.
+
+use Getopt::Long;
+use strict;
+use lib "$ENV{OSCAR_HOME}/lib";
+use OSCAR::Database;
+use OSCAR::Package;
+use OSCAR::Distro;
+use POSIX;
+use oda;
+
+my %options = ();
+
+# set default option values
+my %options = ( 'debug'       => 0,
+                'verbose'     => 0 );
+
+# parse command line options
+GetOptions( \%options,
+            'debug!',
+            'database|d=s',
+            'help',
+            'host|h=s',
+            'password=s',
+            'port|p=i',
+            'type|t=s',
+            'user|u=s',
+            'verbose!',
+            'version' )
+    || usage(1);
+print "$0: after GetOptions ARGV=<@ARGV>\n" if $options{debug};
+oda::print_hash( "", "$0: options after GetOptions", \%options) if $options{debug};
+
+my ($oscar_server_distribution,$oscar_server_distribution_version) = which_distro_server();
+my $mysql_service_name = which_mysql_name($oscar_server_distribution,$oscar_server_distribution_version);
+
+my $oscar_server_architecture;
+my $uname_data = (uname)[4];
+if ( $uname_data eq "i386" ) {
+    $oscar_server_architecture = "ia32";
+} elsif ( $uname_data eq "i686" ) {
+    $oscar_server_architecture = "ia32";
+} elsif ( $uname_data eq "ia64" ) {
+    $oscar_server_architecture = "ia64";
+} else {
+    my $oscar_server_architecture = "Unknown";
+    warn "$0: Cannot determine architecture of oscar server machine";
+}
+
+# open the database
+#database_connect() ||
+#die "$0: cannot connect to oda database";
+# START LOCKING FOR NEST && open the database
+my @tables = ("oscar", "oda_shortcuts");
+my %options = ();
+my @errors = ();
+if(! locking("write", \%options, \@tables, \@errors)){
+    die "$0: cannot connect to oda database";
+}
+
+
+# write out one global oscar record, or modify an existing one
+my @assigns = ();
+my $oscar_version;
+if ( -r "$ENV{OSCAR_HOME}/VERSION" ) {
+    $oscar_version = `cat $ENV{OSCAR_HOME}/VERSION`;
+    chomp $oscar_version;
+} else {
+    $oscar_version = "CVS";
+}
+push @assigns, "oscar.oscar_version~$oscar_version";
+push @assigns, "oscar.oscar_server_architecture~$oscar_server_architecture";
+push @assigns, "oscar.oscar_server_distribution~$oscar_server_distribution"
+    if defined $oscar_server_distribution && $oscar_server_distribution ne "";
+push @assigns, "oscar.oscar_server_distribution_version~$oscar_server_distribution_version"
+    if defined $oscar_server_distribution_version && $oscar_server_distribution_version ne "";
+
+my $global_values_table = "oscar";
+
+my @table_fields = ( "$global_values_table" );
+my @read_results = ();
+my @error_strings = ();
+if ( ! oda::read_records( \%options,
+			  \@table_fields,
+			  undef,
+			  \@read_results,
+			  1,
+			  \@error_strings ) ) {
+    warn shift @error_strings while @error_strings;
+} else {
+    if ( ! @read_results ) {
+	print "Creating the global oscar information record\n";
+	if ( ! oda::insert_record( \%options,
+				   "oscar",
+				   \@assigns,
+				   undef,
+				   \@error_strings ) ) {
+	    warn shift @error_strings while @error_strings;
+	}
+    } else {
+	print "$0: very strange, there are more than 2 records table <$global_values_table>\n"
+	    if scalar @read_results > 1;
+	print "Modifying the global oscar information record\n";
+	if ( ! oda::modify_records( \%options,
+				    \@table_fields,
+				    \@assigns,
+				    undef,
+				    \@error_strings ) ) {
+	    warn shift @error_strings while @error_strings;
+	}
+    }
+}    
+
+# UNLOCKING FOR NEST
+unlock(\%options, \@errors);
+
+exit 0;
+
+
+
+
+
+
+

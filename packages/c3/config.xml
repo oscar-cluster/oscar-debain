@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE package SYSTEM "../package.dtd">
+<oscar>
+  <!--
+      Copyright (c) 2002 The Trustees of Indiana University.  
+                         All rights reserved.
+      
+      This file is part of the OSCAR software package.  For license
+      information, see the COPYING file in the top level directory of the
+      OSCAR source distribution.
+     
+      $Id$
+  -->
+  <name>c3</name>
+
+  <version>
+    <major>4</major>
+    <minor>0</minor>
+    <subversion>1</subversion>
+    <release>2</release>
+    <epoch>1</epoch>
+  </version>
+
+  <class>core</class>
+
+  <summary>Cluster Command and Control (C3) - command line tool suite</summary>
+  <license>freely distributable</license>
+  <group>Application/System</group>
+  <url>http://www.csm.ornl.gov/torc/C3/</url>
+
+  <packager>
+    <name>Thomas Naughton</name>
+    <email>naughtont@ornl.gov</email>
+  </packager>
+
+  <description>The Cluster Command and Control (C3) tool suite
+offers a command line interface for system and user administration
+tasks on a cluster.</description>
+
+  <rpmlist>
+      <rpm>rsync</rpm>
+  </rpmlist>
+  <rpmlist>
+      <filter group="oscar_server"/>
+      <rpm>c3</rpm>
+      <rpm>c3-profiled</rpm>
+  </rpmlist>
+  <rpmlist>
+      <filter group="oscar_server" distribution='mandrake' distribution_version='9.0'/>
+      <rpm>python2-compat</rpm>
+  </rpmlist>
+  <rpmlist>
+      <filter group="oscar_clients"/>
+      <rpm>c3-ckillnode</rpm>
+      <rpm>c3-c3cmd-filter</rpm>
+  </rpmlist>
+</oscar>

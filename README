@@ -1,0 +1,53 @@
+Copyright 2004, Open Cluster Group
+
+This file is part of the OSCAR distribution from the Open Cluster
+Group.  See the OSCAR and OCG web pages:
+
+	http://oscar.sourceforge.net/
+	http://www.openclustergroup.org/
+
+The OSCAR framework is covered by the GNU General Public License.  See
+the COPYING file in the top-level OSCAR directory.  Software packages
+that are included in an OSCAR distribution have their own licenses.
+
+-------------------------------------------------------------------------
+
+This is the general README file for OSCAR v4.0.  See our
+wonderful web site:
+
+	http://oscar.openclustergroup.org/
+
+Full installation instructions and release notes for OSCAR can be
+found in doc/install.pdf.  If you're brave, well familiar with Linux
+system administration and cluster concepts, and feel that you can skip
+all the details, you can jump into the OSCAR quick installation
+document in doc/quick_install.pdf.
+
+User instructions for utilizing the software installed on OSCAR
+clusters can be found in doc/user.pdf.
+
+Note that there are actually three flavors of distribution packages
+for OSCAR, depending on your bandwidth and installation/development
+needs:
+
+1. "Regular": All the OSCAR installation stuff that most users need to
+   install and operate an OSCAR cluster.
+
+2. "Extra Crispy": Same as Regular, except that the SRPMs for most of
+   the OSCAR-specific RPMs are also included.  This distribution
+   package is significantly larger than Regular, and is not necessary
+   for most users -- only those who are interested in source RPMs need
+   the Extra Crispy distribution.  The SRPMs can be found under
+   packages/*/SRPMS/ directories.
+
+3. "Secret Sauce": This distribution contains *only* the SRPMs for
+   OSCAR-specific RPMs in the Regular and Extra Crispy distributions
+   (it's essentially (Extra Crispy - Regular)).  It is intended only
+   for those who initially downloaded the Regular distribution and
+   later decided that they wanted the SRPMs as well.  The Secret Sauce
+   distribution is intended to be expanded over your Regular
+   installation -- it will create packages/*/SRPMS/ directories and
+   populate them with the relevant .src.rpm files.
+
+All three distributions can be downloaded from the main OSCAR web
+page.

@@ -1,0 +1,42 @@
+% -*- latex -*-
+%
+% $Id$
+%
+% Copyright 2004, Open Cluster Group
+% 
+% This file is part of the OSCAR distribution from the Open Cluster
+% Group.  See the OSCAR and OCG web pages:
+% 
+% 	http://oscar.sourceforge.net/
+% 	http://www.openclustergroup.org/
+% 
+% The OSCAR framework is covered by the GNU General Public License.  See
+% the COPYING file in the top-level OSCAR directory.  Software packages
+% that are included in an OSCAR distribution have their own licenses.
+% 
+% -------------------------------------------------------------------------
+%
+
+\subsection{HDF5}
+\label{app:hdf5-overview}
+
+\input{../../packages/hdf5/doc/common}
+
+When compiling HDF5 in parallel mode, two compiler issues must be
+considered:
+
+\begin{itemize}
+\item there is a bug in the \cmd{gcc} 2.96 compiler which affects
+  HDF5.  To work properly, both the MPI implementation and HDF5 must
+  be compiled with a compiler other than 2.96. The HDF5 Group suggests
+  using \cmd{gcc} 2.95.3 for both.
+  
+\item when compiling HDF5 in parallel mode with an MPI implementation
+  on a Linux system with kernels 2.4 or greater, you must specify that
+  it should support $>$2GB file sizes.  For example, configure the
+  installation of MPICH with the following configuration command-line
+  option:
+
+  \noindent {\small \verb+-cflags="-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64"+ }
+\end{itemize}
+

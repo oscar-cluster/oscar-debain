@@ -1,0 +1,24 @@
+#!/bin/sh
+#
+# Copyright (c) 2002 The Trustees of Indiana University.  
+#                    All rights reserved.
+#
+# This file is part of the OSCAR software package.  For license
+# information, see the COPYING file in the top level directory of the
+# OSCAR source distribution.
+
+# $Id$
+#
+# Authors: Jason Brechin
+#          Jeremy Enos
+
+
+cd $HOME
+clients=`echo $@ | wc -w`
+
+$HOME/pbs_test $clients 1 $HOME/pvm/pbs_script.pvm "SUCCESSFUL" \
+    $HOME/pvm/pvmtest 3 "PVM (via PBS)"
+
+# All done
+
+exit 0

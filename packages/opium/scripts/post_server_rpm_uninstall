@@ -1,0 +1,27 @@
+#!/usr/bin/perl
+# $Id$
+#
+# This file is part of the OSCAR software package.  For license
+# information, see the COPYING file in the top level directory of the
+# OSCAR source distribution.
+#
+# server uninstall script
+# Must exit with 0 on success or non-zero for any failures.
+
+remove_rpms( "ssh-oscar" );
+
+#-------------------------------------------------------------
+#  Input: Array of rpms to remove (short name no version)
+# Output: n/a
+# Return: 0 (success) otherwise die's  :)
+#-------------------------------------------------------------
+sub remove_rpms
+{
+	my @rpms = @_;
+	my $cmd = "rpm -e " . join(" ", @rpms);
+
+	my $rc = system($cmd);
+	die "Error: command ($cmd)\n" if($rc);
+
+	return(0);
+}
