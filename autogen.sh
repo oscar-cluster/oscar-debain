@@ -203,6 +203,7 @@ EOF
 	    -a "$mm_file" != "." \
 	    -a "$mm_file" != ".." \
 	    -a "$mm_file" != "autom4te.cache" \
+	    -a "$mm_file" != "CVS" \
 	    -a "$mm_file" != ".svn"; then
 	    mm_subdirs="$mm_file $mm_subdirs"
 	elif test -f "$mm_file"; then
@@ -255,6 +256,7 @@ traverse_tree() {
 
     for file in "$topdir"/*; do
 	if test "$file" != "$topdir/.svn" -a \
+	    "$file" != "$topdir/CVS" -a \
 	    "$file" != "." -a \
 	    "$file" != ".." -a \
 	    -d "$file" -a \
