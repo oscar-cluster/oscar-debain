@@ -1,0 +1,178 @@
+#!/usr/bin/env perl
+#
+# Copyright (c) 2005, INRIA.
+# 		All rights reserved.
+# Copyright © 2003, The Board of Trustees of the University of Illinois. All rights reserved.
+# Copyright (c) 2002 The Trustees of Indiana University.  
+#                    All rights reserved.
+# 
+# This file is part of the OSCAR software package.  For license
+# information, see the COPYING file in the top level directory of the
+# OSCAR source distribution.
+#
+# $Id$
+#
+
+#use strict;
+use lib "$ENV{OSCAR_HOME}/lib";
+use OSCAR::Logger;
+use Carp;
+use OSCAR::Distro;
+use OSCAR::Package;
+use XML::Simple;
+use File::Copy;
+
+# Version included in media directory
+
+my $ver = "0.90";
+my $package_dir = "oda";
+my $package_rpms_dir = "$ENV{OSCAR_HOME}/packages/$package_dir/DEB";
+my $oscar_rpms_dir = "/tftpboot/rpm";
+
+oscar_log_section("Setup ODA for DEB distrib");
+oscar_log_subsection("Checking to see if we need to install ODA DEBs");
+
+# Definition of distro type and version
+
+my ($distro_name, $distro_version) = which_distro_server();
+
+oscar_log_subsection("The distribution is a $distro_name, $distro_version");
+
+# find a list of rpm names to check for and rpm files to install
+
+my $mysqld;
+
+if ( $distro_name eq "redhat" || $distro_name eq "rhas" ) {
+    @wanted_rpms = qw( mysql
+		       perl-DBD-MySQL
+		       perl-DBI
+		       perl-CGI
+		       mysql-server
+		       oda );
+    $mysqld      = 'mysqld';
+}
+
+elsif ( $distro_name eq "fedora" ) {
+    @wanted_rpms = qw( mysql
+		       perl-DBD-MySQL
+		       perl-DBI
+		       mysql-server
+		       oda );
+    $mysqld      = 'mysqld';
+}
+
+elsif ( $distro_name eq "suse") {
+    @wanted_rpms = qw( mysql
+		       mysql-client
+		       perl-Msql-Mysql-modules
+		       perl-DBI
+		       perl-Data-ShowTable
+		       mysql-shared
+		       oda );
+    $mysqld      = 'mysql';
+}
+
+elsif ( $distro_name eq "debian") {
+    @wanted_rpms = qw( mysql-client
+			libdbd-mysql-perl
+			libdbi-perl
+			libcgi-perl
+			mysql-server 
+			perl-tk
+			oda );
+    $mysqld	= 'mysql';
+}
+
+elsif ( $distro_name eq "mandrake") {
+    if ( `rpm -q --qf '%{VERSION}' mandrake-release` == 10.0 ) {
+	@wanted_rpms = qw( MySQL
+			   MySQL-client
+			   perl-DBI
+			   perl-Mysql
+			   perl-Data-ShowTable
+			   perl-ExtUtils-PerlPP
+			   oda
+			   MySQL-common
+			   libmysql12
+			   perl-CGI );
+    }
+    elsif ( `rpm -q --qf '%{VERSION}' mandrake-release` == 9.2 ) {
+	@wanted_rpms = qw( MySQL
+			   MySQL-client
+			   perl-DBI
+			   perl-Mysql
+			   perl-Data-ShowTable
+			   perl-ExtUtils-PerlPP
+			   oda
+			   MySQL-common
+			   libmysql12
+			   perl-CGI );
+    }
+    elsif ( `rpm -q --qf '%{VERSION}' mandrake-release` == 9.1 ) {
+	@wanted_rpms = qw( MySQL
+			   MySQL-client
+			   libmysql10
+			   perl-DBI
+			   perl-Mysql
+			   perl-ExtUtils-PerlPP
+			   oda
+			   MySQL-common
+			   libmysql12
+			   perl-CGI );
+    } else {
+	@wanted_rpms = qw( MySQL
+			   MySQL-client
+			   libmysql10
+			   perl-DBI
+			   perl-CGI
+			   perl-Mysql
+			   perl-ExtUtils-PerlPP
+			   oda );
+    }
+    $mysqld      = 'mysql';
+}
+
+else {
+    print "\n\nCannot determine distribution and version!!!!\nCannot determine oda rpms to install!!!!\n\n";
+    exit 1;
+}
+
+# read in the file names in this package's RPMS directory
+
+opendir(DIR, "$package_rpms_dir" )
+    || croak("Cannot open directory $package_rpms_dir to find DEBs for ODA");
+my @package_rpm_files = grep(/\.deb$/, readdir(DIR));
+chomp @package_rpm_files;
+closedir DIR;
+
+# Copy the ODA DEBs to the DEB pool (if they're not already there)
+
+foreach my $rpm_file (@package_rpm_files) {
+    if (! -e "$oscar_rpms_dir/$rpm_file") {
+	oscar_log_subsection("Copying $rpm_file to $oscar_rpms_dir\n");
+	copy("$package_rpms_dir/$rpm_file", "$oscar_rpms_dir/$rpm_file") ||
+	    croak("Unable to copy $rpm_file to $oscar_rpms_dir");
+    }
+}
+
+# Now install the "best" version of all the required RPMs if necessary
+oscar_log_subsection("Checking ODA installation");
+$_=`dpkg --status oda`;
+my ($pqtv)=m/Version: (.*)\n/;
+if ( !$pqtv ) {
+  oscar_log_subsection("Installing ODA DEBs @wanted_rpms");
+  install_packages(@wanted_rpms) or 
+      croak("ODA is giving up and will not be installed");
+} else {
+  oscar_log_subsection("ODA is already installed");
+}
+# Exit properly so that the exit status gets propogated
+
+oscar_log_subsection("Checking status of MySQL server $mysqld");
+if ( !system("/etc/init.d/$mysqld status | grep -c stopped") ) {
+  !system("/etc/init.d/$mysqld restart") or croak("Couldn't restart $mysqld");
+} else {
+  oscar_log_subsection("$mysqld already running");
+}
+
+exit(0);
