@@ -1,0 +1,46 @@
+#!/bin/sh
+#
+# Copyright (c) 2005, INRIA.
+# 			All rights reserved
+# Copyright (c) 2004, The Board of Trustees of the University of Illinois.
+#                     All rights reserved.
+# Copyright (c) 2004 The Trustees of Indiana University.
+#                         All rights reserved.
+#
+# This file is part of the OSCAR software package.  For license
+# information, see the COPYING file in the top level directory of the
+# OSCAR source distribution.
+#
+# $Id$
+#
+# setup script for the packman-depman package
+#
+
+# Install the relevant Debs.  Easy enough to hard-code for now, since
+# we only handle Linux/Deb.  This script will likely get more complicated.
+
+# debs="packman packman-rpm depman depman-updaterpms"
+debs="packmandepman"
+
+# Check for each Deb
+
+echo "Checking for packman/depman Debs..."
+need_to_install=
+for deb in $debs; do
+#	rpm -q $rpm >/dev/null 2>&1
+#	req=`dpkg --status $deb | grep Version`;
+#	if test "x$req" = x; then
+#		deb_filename="`ls -1 $OSCAR_HOME/share/prereqs/packman/DEBS/$deb\_[0-9]*deb`"
+		need_to_install="$deb $need_to_install"
+#		echo "--> will install $deb"
+#	fi
+done
+
+if test -n "$need_to_install"; then
+	echo "Installing: $need_to_install"
+	apt-get install $need_to_install --force-yes
+fi
+
+# All done
+
+exit 0

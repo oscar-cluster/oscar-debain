@@ -1,8 +1,6 @@
-#!/bin/sh
+#!/usr/bin/perl
 #
-# Copyright (c) 2004, The Board of Trustees of the University of Illinois.
-#                     All rights reserved.
-# Copyright (c) 2004 The Trustees of Indiana University.
+# Copyright (c) 2005, INRIA.
 #                         All rights reserved.
 #
 # This file is part of the OSCAR software package.  For license
@@ -11,32 +9,25 @@
 #
 # $Id$
 #
-# setup script for the packman-depman package
+# check the package format to install and setup packman-depman packages
 #
 
-# Install the relevant RPMs.  Easy enough to hard-code for now, since
-# we only handle Linux/RPM.  This script will likely get more complicated.
+use strict;
+use Cwd qw(chdir cwd);
 
-rpms="packman packman-rpm depman depman-updaterpms"
+use lib cwd() . "/../lib";
+use vars qw($VERSION);
+use OSCAR::Logger;
 
-# Check for each RPM
+oscar_log_section ("Setup packman...");
+if ( !system("dpkg-deb --help >/dev/null 2>/dev/null") )
+  {
+    oscar_log_subsection ("Running setup for Deb based distro...");
+    system ("$ENV{OSCAR_HOME}/share/prereqs/packman/scripts/setup.deb\n");
+  }
+else 
+  {
+    oscar_log_subsection ("Running setup for RPM based distro...");
+    system ("$ENV{OSCAR_HOME}/share/prereqs/packman/scripts/setup.rpm\n");
+  }
 
-echo "Checking for packman/depman RPMs..."
-need_to_install=
-for rpm in $rpms; do
-	rpm -q $rpm >/dev/null 2>&1
-	if test $? = 1; then
-		rpm_filename="`ls -1 $OSCAR_HOME/share/prereqs/packman/RPMS/$rpm-[0-9]*rpm`"
-		need_to_install="$rpm_filename $need_to_install"
-		echo "--> will install $rpm"
-	fi
-done
-
-if test -n "$need_to_install"; then
-	echo "Installing: $need_to_install"
-	rpm -Uvh $need_to_install
-fi
-
-# All done
-
-exit 0
