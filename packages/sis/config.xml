@@ -38,14 +38,16 @@
   <rpmlist>
       <rpm>systemconfigurator</rpm>
       <rpm>systemimager-common</rpm>
-      <rpm>perl-AppConfig</rpm>
+<!--      <rpm>perl-AppConfig</rpm>-->
       <rpm>systemimager-client</rpm>
   </rpmlist>
   <rpmlist>
       <filter group="oscar_server"/>
       <rpm>systeminstaller</rpm>
 <!--      <rpm>systeminstaller-x11</rpm>-->
-      <rpm>perl-MLDBM</rpm>
+      <rpm>libappconfig</rpm>
+      <rpm>llibmldbm-perl</rpm>
+<!--	  <rpm>perl-MLDBM</rpm>-->
       <rpm>systemimager-server</rpm>
 <!--      <rpm>systemimager-flamethrower</rpm>-->
       <rpm>systemimager-server-flamethrowerd</rpm>
