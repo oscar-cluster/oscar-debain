@@ -299,6 +299,7 @@ run_global() {
 	    -d "$rg_pkg" -a \
 	    "$rg_base" != "." -a \
 	    "$rg_base" != ".." -a \
+	    "$rg_pkg" != "CVS" -a \
 	    ! -f "$rg_pkg/$ignore_file"; then
 	    for rg_subdir in $rg_pkg_subdirs; do
 		if test -d "$rg_pkg/$rg_subdir" -a \
