@@ -1,96 +1,50 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 
-# Copyright (c) 2002 The Trustees of Indiana University.  
+# Copyright (c) 2005, INRIA.  
 #                    All rights reserved.
-# 
-# This file is part of the OSCAR software package.  For license
-# information, see the COPYING file in the top level directory of the
-# OSCAR source distribution.
 #
 # $Id$
-#
+# 
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+ 
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+ 
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+#   This is the oscar installation program.  It must be called with
+#   one argument which is the installation network device
+
+# Find the binary package format
 
 use strict;
 use lib "$ENV{OSCAR_HOME}/lib";
+use vars qw($VERSION);
 use OSCAR::Logger;
 use Carp;
 
-# Version included in media directory
-
-my $ver = "2.31";
 my $real_name = "XML-Parser";
-my $module_name = "XML::Parser";
 
-# Helper subroutine
+oscar_log_section ("XML-Parser setup");
+oscar_log_subsection("Checking package format...");
+my $topdir = "$ENV{OSCAR_HOME}/share/prereqs/$real_name";
+oscar_log_subsection("Package directory is $topdir");
 
-sub do_run {
-    my $cmd = join(' ', @_);
-    if (system($cmd) != 0) {
-	croak("Not able to execute: $cmd");
-    }
-}
+if ( !system("rpm --help >/dev/null 2>/dev/null") )
+  {
+    print("Using RPM packages\n");
+    system ("$topdir/scripts/setup.rpm\n");
+  }
+if ( !system("dpkg-deb --help >/dev/null 2>/dev/null") )
+  {
+    print("Using Deb packages\n");
+    system ("$topdir/scripts/setup.deb\n");
+  }
 
-# See if we need to install the perl module
-
-oscar_log_subsection("Checking to see if we need to install $module_name");
-my $eval_str = "{ require $module_name }";
-eval $eval_str;
-if ($@) {
-    oscar_log_subsection("$module_name is not yet installed");
-
-    my $topdir = "$ENV{OSCAR_HOME}/share/prereqs/$real_name";
-    my $tarball = "$topdir/media/$real_name-$ver.tar.gz";
-    my $tempdir = "/tmp/oscar-install-$real_name.$$";
-
-    mkdir($tempdir) or carp("Can't create temp dir: $tempdir");
-    chomp(my $pwd = `pwd`);
-    chdir($tempdir);
-
-    oscar_log_subsection("Checking expat dependency");
-    my $expat = `rpm -qa | grep expat | grep -c devel`;
-    chomp $expat;
-    if ( $expat == 0 ) {
-      oscar_log_subsection("It doesn't look like expat is installed");
-      oscar_log_subsection("Installing the expat libraries (expat or libexpat0)...");
-      opendir(RPMS, "/tftpboot/rpm");
-      my @rpmsindir = readdir(RPMS);
-      closedir(RPMS);
-      if ( grep( /^libexpat0/, @rpmsindir ) ) {
-        #Mandrake - install libexpat0
-	if ( `rpm -qa | grep -c libexpat0` != 0 ) {
-          system("rpm -Uvh /tftpboot/rpm/libexpat0-devel*.rpm");
-	} else {
-          system("rpm -Uvh /tftpboot/rpm/libexpat0-*.rpm");
-	}
-      } else {
-        #elsewhere - install expat
-	if ( `rpm -qa | grep -c expat` != 0 ) {
-          system("rpm -Uvh /tftpboot/rpm/expat-devel*.rpm");
-	} else {
-	  system("rpm -Uvh /tftpboot/rpm/expat-*.rpm");
-        }
-      }
-    }
-
-    do_run("tar zxf $tarball");
-    croak("Not able to chdir($real_name-$ver)")
-	if (!chdir("$real_name-$ver"));
-    do_run("perl Makefile.PL");
-    do_run("make all");
-    do_run("make install");
-
-    oscar_log_subsection("$module_name installed successfully");
-
-    chdir($pwd);
-    system("rm -rf $tempdir");
-} 
-
-# It's already installed -- nothing to do
-
-else {
-    oscar_log_subsection("$module_name appears to be installed already");
-}
-
-# All done
-
-0;

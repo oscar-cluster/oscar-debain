@@ -1,76 +1,33 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
+#
+# Copyright (c) 2005, INRIA.
+#                         All rights reserved.
+#
+# This file is part of the OSCAR software package.  For license
+# information, see the COPYING file in the top level directory of the
+# OSCAR source distribution.
+#
+# $Id$
+#
+# check the package format to install and setup packman-depman packages
+#
 
-# Copyright (c) 2003, The Board of Trustees of the University of Illinois.
-#                     All rights reserved.
-# Author: Jason Brechin
+use strict;
+use Cwd qw(chdir cwd);
 
-
-use lib "$ENV{OSCAR_HOME}/lib";
+use lib cwd() . "/../lib";
+use vars qw($VERSION);
 use OSCAR::Logger;
-use Carp;
-use OSCAR::Distro;
-use OSCAR::Package;
-use File::Copy;
 
-# Install script for Perl-Tk
-use Config;
-
-#print "Finding correct site_perl directory: \n";
-#print "$Config{'sitearchexp'}\n";
-oscar_log_subsection("Finding correct perl version: $Config{'version'}\n");
-my $perl_version = $Config{'version'};
-my ($distn, $distv) = which_distro_server();
-my $rpmdir = "$ENV{OSCAR_HOME}/share/prereqs/perl-Tk/media/RPMS";
-
-opendir(DIR, "$rpmdir") || croak("Can't open $rpmdir for perl-Tk");
-my @rpmvers = grep{ !/^\./ && !/Makefile/ } readdir(DIR);
-#chomp @rpmvers;
-closedir DIR;
-
-my $match = 0;
-foreach my $dir (@rpmvers) {
-  $perl_version =~ $dir;
-  if ( $& eq $dir ) {
-    $rpmdir = "$rpmdir/$dir";
-    $match = 1;
-    break;
+oscar_log_section ("Setup ODA...");
+if ( !system("rpm --help >/dev/null 2>/dev/null") )
+  {
+    oscar_log_subsection ("Running setup for RPM based distro...");
+    system ("$ENV{OSCAR_HOME}/share/prereqs/oda/scripts/setup.rpm\n");
   }
-}
-oscar_log_subsection("Checking to see if we need to install Perl-Tk\n");
-
-if ( system("rpm -q perl-Tk >/dev/null") != 0  ) {
-  oscar_log_subsection("We do need to install perl-Tk\n");
-  if ( $match == 0 ) {
-    croak("Can't install perl-Tk for perl $perl_version, we have @rpmvers");
-  } else {
-    opendir(DIR, "$rpmdir") || croak("Can't open $rpmdir for perl-Tk");
-    my @rpms = grep { /.rpm/ } readdir(DIR);
-    closedir DIR;
-    foreach $file (@rpms) {
-      if (! -e "/tftpboot/rpm/$file" ) {
-        oscar_log_subsection("Copying $rpmdir/$file to /tftpboot/rpm/$file\n");
-        copy("$rpmdir/$file", "/tftpboot/rpm/$file") || croak("Unable to copy $rpmdir/$file to /tftpboot/rpm/$file");
-      }
-    }
-    if ( $distn eq 'mandrake' ) {
-      if ( $distv eq '9.2' ) {
-	      #MDK9.2
-	@ptkrpms = qw( perl-Tk perl-PerlIO-gzip );
-      }elsif ( $distv eq '9.1' ) {
-	      #MDK9.1
-        @ptkrpms = qw( perl-Tk perl-PerlIO-gzip );
-      } else { 
-	      #MDK9.0
-        @ptkrpms = qw( perl-Tk pwlib1 );
-      }
-    } else {
-	      #RH
-      @ptkrpms = qw( perl-Tk );
-    }
-    install_packages(@ptkrpms) || croak("perl-Tk cannot be installed, check for error messages from rpm");
+if ( !system("dpkg-deb --help >/dev/null 2>/dev/null") )
+  {
+    oscar_log_subsection ("Running setup for Deb based distro...");
+    system ("$ENV{OSCAR_HOME}/share/prereqs/oda/scripts/setup.deb\n");
   }
-} else {
-  oscar_log_subsection("We don't need to install perl-Tk\n");
-}
 
-exit(0);
