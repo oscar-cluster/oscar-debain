@@ -1,0 +1,318 @@
+#!/usr/bin/perl
+
+# Copyright (c) 2005, INRIA
+# 		All rights reserved
+# Copyright 2004 Revolution Linux
+#           Benoit des Ligneris <bdesligneris@revolutionlinux.com>
+# Copyright (c) 2003, The Board of Trustees of the University of Illinois.
+#                     All rights reserved.
+# Copyright 2002 International Business Machines
+#                Sean Dague <japh@us.ibm.com>
+# Copyright (c) 2002 The Trustees of Indiana University.  
+#                    All rights reserved.
+#
+# $Id$
+# 
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+ 
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+ 
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+#   This is the oscar installation program.  It must be called with
+#   one argument which is the installation network device
+
+use strict;
+use Cwd qw(chdir cwd);
+
+use lib cwd() . "/lib";
+use vars qw($VERSION);
+use OSCAR::Logger;
+use OSCAR::Distro;
+use POSIX;
+use Carp;
+use OSCAR::Database;
+
+# First of all, enforce that the user running this script is 'root'
+
+croak "You must be 'root' to run this script.  Aborting" if ($< != 0);
+
+# If $OSCAR_HOME is not set, then set it with whatever came in from
+# configure's --prefix.
+
+if (!defined($ENV{OSCAR_HOME})) {
+    my $found = 0;
+
+    # Look for an output file from configure that specifies where
+    # OSCAR_HOME should be.  First look relative to this directory,
+    # then look in /etc/profile.d.
+
+    if (-f "scripts/oscar_home.sh" &&
+        open(OH, "grep OSCAR_HOME scripts/oscar_home.sh|")) {
+        $found = 1;
+    } elsif (-f "/etc/profile.d/oscar_home.sh" &&
+             open(OH, "grep OSCAR_HOME /etc/profile.d/oscar_home.sh|")) {
+        $found = 1;
+    }
+
+    # If we found it, read and use it.  Otherwise, complain and exit.
+
+    if ($found == 1) {
+        my $temp = <OH>;
+        chomp($temp);
+        close(OH);
+
+        my ($bogus, $oscar_home) = split(/=/, $temp);
+	$ENV{OSCAR_HOME} = $oscar_home;
+        printf("Manually setting OSCAR_HOME to: $ENV{OSCAR_HOME}\n");
+    } else {
+	    die("ERROR: You must (at a minimum) run configure first.\n");
+    }
+}
+
+# Now check to see if there is an $ENV{OSCAR_HOME} directory, and if
+# so, if we're in it.
+
+if (! -d $ENV{OSCAR_HOME}) {
+    die("ERROR: The environment variable \$OSCAR_HOME was set, but the directory 
+that it points to ($ENV{OSCAR_HOME}) does not exist!");
+}
+if (!chdir($ENV{OSCAR_HOME})) {
+    die("ERROR: The environment variable \$OSCAR_HOME was set, but could not 
+change into the directory that it points to ($ENV{OSCAR_HOME})!");
+}
+
+# Get OSCAR's version
+
+my $oscar_version;
+if (!open (V, "VERSION")) {
+    die("ERROR: Unable to open OSCAR's VERSION file");
+}
+while (<V>) {
+    chomp;
+    $oscar_version = $_;
+}
+close(V);
+
+# Once here, we know that $ENV{OSCAR_HOME} is set, it exists, we can
+# get in it, and we have successfully read the VERSION file from it.
+# So we should be good to go for the rest of the installation.
+
+# Setup the lockfile
+
+my $lockfile = "$ENV{OSCAR_HOME}/.install_cluster_lockfile";
+
+# Set perl to autoflush all output
+
+$| = 1;
+
+# END processing to remove the lockfile when we die(), exit, or otherwise
+# cease to exist.
+END {
+    unlink $lockfile if $lockfile && -f $lockfile;
+}
+
+# Check for the lockfile (this is certainly not foolproof -- it's just
+# "good enough")
+
+if (-f $lockfile) {
+    open(LOCKFILE, $lockfile);
+    my $pid = <LOCKFILE>;
+    close(LOCKFILE);
+    # chmod($pid);  DNL ASKS: WHO THINKS THIS DOES ANYTHING CORRECT?
+    chomp $pid;  #  DNL: Perhaps this was meant?
+    print "There is an OSCAR installer lockfile that says an installer process\n";
+    print "is still running with process id $pid. Checking if that is true ...\n";
+    if( kill 0, $pid ) {
+	print "There is a process running with that process id.\n";
+	print "If this is no an OSCAR installer process, remove\n";
+	print "the following file and run $0 again:\n";
+	print "$lockfile\n";
+	undef $lockfile; # Prevent END processing from deleting lockfile.
+	exit(0);
+    } else {
+	print "There is no process running with process id $pid.\n";
+	print "Removing lockfile $lockfile and continuing.\n";
+	unlink $lockfile;
+    }
+}
+
+# Write our PID to the lockfile
+
+open(LOCKFILE, ">$lockfile");
+print LOCKFILE $$;
+close(LOCKFILE);
+
+# Setup to capture all stdout/stderr
+
+my $oscar_logfile = $ENV{OSCAR_HOME} . "/oscarinstall.log";
+if (!open (STDOUT,"| tee $oscar_logfile") || !open(STDERR,">&STDOUT")) {
+    die("ERROR: Cannot tee stdout/stderr into the OSCAR logfile:
+   $oscar_logfile
+Aborting the install.\n");
+}
+
+# First output banner
+
+oscar_log_section("Running OSCAR install_cluster script");
+
+# Fix to make multi lingualness work
+
+$ENV{LANG} = "C";
+$ENV{LC_ALL} = "C";
+$ENV{LANGUAGE} = "C";
+$ENV{LC_COLLATE} = "C";
+$ENV{LC_CTYPE} = "C";
+$ENV{LC_MESSAGES} = "C";
+$ENV{LC_MONETARY} = "C";
+$ENV{LC_NUMERIC} = "C";
+$ENV{LC_TIME} = "C";
+
+# add entries to path that we know we will need
+
+$ENV{PATH} = $ENV{PATH} .
+    ':/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin';
+
+# Sanity check: ensure that /tftpboot/rpm exists
+
+oscar_log_subsection("Quick sanity check for /tftpboot/rpm");
+if (! -d "/tftpboot/rpm") {
+    print("ERROR: /tftpboot/rpm directory does not exist.  You must create this directory\nand copy all of your distro RPMs there before running install_cluster.\n");
+    die("Cannot continue");
+}
+
+# Ensure that the package scripts are executable (wizard_prep runs
+# some of them)
+
+system("chmod 755 packages/*/scripts/*");
+
+# Check to see if rpms for tftp and/or tftp-server are installed.
+# If so, remove them because they conflict with the tftp-hpa rpm.
+foreach my $deb ('tftp', 'tftp-server')
+  {
+    # "dpkg-query -s" replaces the initial "rpm -q"
+    if ( !system("dpkg-query -s $deb >/dev/null 2>/dev/null") )
+      {
+        system("dpkg -r $deb");
+        oscar_log_subsection("Removing $deb Deb");
+      }
+  }
+
+# my $pqtv = `rpm -q --quiet --qf '%{VERSION}' perl-Qt 2>/dev/null`;
+$_=`dpkg --status libqt-perl`;
+my ($pqtv)=m/Version: (.*)\n/; 
+
+if ( $pqtv && $pqtv < 3 ) {
+#  !system("rpm -e perl-Qt") or warn("Couldn't remove perl-Qt");
+  !system("dpkg -r libqt-perl") or warn("Couldn't remove libqt-perl");
+  oscar_log_subsection("Removing libqt-perl Deb");
+}
+
+# Run the wizard_prep script
+
+my $cmd = "cd $ENV{OSCAR_HOME}/scripts && ./wizard_prep";
+
+oscar_log_subsection("Running: \"$cmd\"");
+!system($cmd)
+    or die("Oscar Wizard preparation script failed to complete");
+oscar_log_subsection("Successfully ran wizard_prep");
+
+# Seed ODA
+
+my $adapter = shift;
+my @results;
+
+if ( !defined($adapter) || $adapter =~ /force/ ) {
+    my $force = ($adapter =~ /force/);
+    system("$ENV{OSCAR_HOME}/scripts/set_oscar_interface $force");
+} else { 
+#    print "DEBUG: Setting adapter to $adapter\n";
+    system("oda modify_records oscar.interface~$adapter");
+}
+
+$adapter = `oda read_records oscar.interface`;
+
+$ENV{OSCAR_HEAD_INTERNAL_INTERFACE}=$adapter;
+
+oscar_log_section("Prerequisites installed");
+
+# Print some environment information
+
+oscar_log_subsection("OSCAR version: $oscar_version");
+my $hostname = (uname)[1];
+my ($shorthostname, $domainname) = split(/\./,$hostname,2);
+oscar_log_subsection("Command line invocation: $0 $adapter " . 
+		     join(" ", @ARGV));
+oscar_log_subsection("Hostname: $shorthostname");
+oscar_log_subsection("Domainname: $domainname");
+oscar_log_subsection("Network interface: $adapter");
+my ($distro_name, $distro_version) = which_distro_server();
+oscar_log_subsection("Linux distribution: $distro_name $distro_version");
+oscar_log_subsection("Kernel version: " . (uname)[2]);
+oscar_log_subsection("Architecture: " . (uname)[4]);
+oscar_log_subsection("Running in directory: " . cwd());
+oscar_log_subsection("PATH: " . $ENV{PATH});
+
+# Do some basic sanity checks -- fail immediately if we can tell right
+# now that this install won't [eventually] succeed.
+
+if ($shorthostname eq "localhost") {
+    die("
+ERROR: Your hostname is \"localhost\".
+OSCAR requires that you choose another hostname.
+Aborting the install.\n");
+}
+if ($hostname eq "localhost.localdomain") {
+    die("
+ERROR: Your hostname is \"localhost.localdomain\".
+OSCAR requires that you choose another hostname.
+Aborting the install.\n");
+}
+if ($distro_name eq "UnknownLinux") {
+    carp("
+##########################################################################
+   WARNING: Installing OSCAR on an unsupported distribution of Linux!
+##########################################################################\n");
+}
+if (!$ENV{DISPLAY}) {
+    die("
+ERROR: Your \"DISPLAY\" environment variable is not set, probably
+indicating that you are not running in an X windows environment.
+OSCAR requires that you run the installer in an X windows environment.
+Aborting the install.\n");
+}
+
+# Check for 2 rpms 1 from each CD
+
+my @filesystem=glob("/tftpboot/rpm/filesystem*rpm");
+my @rsync=glob("/tftpboot/rpm/rsync*rpm");
+# Initial Deb port: we don't care about local files (local repository)
+#if ((scalar(@filesystem)==0) || (scalar(@rsync)==0)) {
+#    die("RPMs missing in /tftpboot/rpm/ (did you copy all CDs?)");
+#}
+
+# Now start the execution
+
+chdir("scripts") or die("Couldn't chdir to scripts");
+
+# Only setup what we have to get to the OSCAR wizard.  All the rest of
+# server prep is going to be driven after the first panel of
+# questions.
+
+$cmd = "./oscar_wizard";
+oscar_log_subsection("Running: \"$cmd\"");
+!system("$cmd 2>&1") 
+    or die("Oscar Wizard failed to run successfully");
+oscar_log_subsection("Successfully ran oscar_wizard");
+
+oscar_log_subsection("Successfully ran OSCAR install_cluster script");
+
+# All done.
