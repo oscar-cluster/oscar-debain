@@ -185,7 +185,7 @@ $ENV{PATH} = $ENV{PATH} .
 
 oscar_log_subsection("Quick sanity check for the local Debian repository in /tftpboot/debian");
 if (! -d "/tftpboot/debian/testing") {
-    print("ERROR: the local Debian repository in the /tftpboot/debian directory does not exist.  You must create this repository running the script "create_local_debian_repository.\n");
+    print("ERROR: the local Debian repository in the /tftpboot/debian directory does not exist.  You must create this repository running the script create_local_debian_repository.\n");
     die("Cannot continue");
 }
 
