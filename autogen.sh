@@ -296,10 +296,10 @@ run_global() {
     for rg_pkg in packages packages/*; do
 	rg_base="`basename $rg_pkg`"
 	if test "$rg_pkg" != "packages/.svn" -a \
+	    "$rg_pkg" != "packages/CVS" -a \
 	    -d "$rg_pkg" -a \
 	    "$rg_base" != "." -a \
 	    "$rg_base" != ".." -a \
-	    "$rg_pkg" != "packages/CVS" -a \
 	    ! -f "$rg_pkg/$ignore_file"; then
 	    for rg_subdir in $rg_pkg_subdirs; do
 		if test -d "$rg_pkg/$rg_subdir" -a \
