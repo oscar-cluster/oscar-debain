@@ -602,7 +602,9 @@ sub copy_pkgs # ($pkgdir) -> 1|undef
         }
     }
   if ($distro_name eq 'debian') {
-    system ("$ENV{OSCAR_HOME}/update_local_debian_repository");
+    print "Updating the local Debian repository...\n";
+    !system ("$ENV{OSCAR_HOME}/update_local_debian_repository")
+    or (carp("Couldn't run $ENV{OSCAR_HOME}/update_local_debian_repository"), return undef);
   }
   return 1; # Made it this far?  Success!
 }

@@ -25,7 +25,7 @@ SUBDIRS			= \
 			src \
 			testing
 
-oscar_SCRIPTS		= install_cluster install_cluster.deb install_cluster.rpm
+oscar_SCRIPTS		= install_cluster install_cluster.deb install_cluster.rpm create_local_debian_repository update_local_debian_repository
 oscar_DATA		= COPYING README VERSION README.RH3AS.txt
 
 EXTRA_DIST		= $(oscar_SCRIPTS) $(oscar_DATA)
