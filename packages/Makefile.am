@@ -31,7 +31,7 @@
 
 include $(top_srcdir)/dist/Makefile.options
 
-SUBDIRS = torque sync_files switcher sis pvm pfilter perl-Qt opium oda ntpconfig networking mpich maui loghost lam kernel_picker hdf5 ganglia disable-services c3 base 
+SUBDIRS = torque sync_files switcher sis pvm pfilter perl-Qt opium oda ntpconfig networking mta-config mpich maui loghost lam kernel_picker hdf5 ganglia disable-services c3 base 
 oscar_SCRIPTS = 
 oscar_DATA = package.dtd 
 EXTRA_DIST = $(oscar_SCRIPTS) $(oscar_DATA)
