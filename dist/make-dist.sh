@@ -193,6 +193,7 @@ rm -f $filelist
 
 cat > $filelist <<EOF
 README
+README.RHEL.txt
 EOF
 for file in `cat $filelist`; do
     sed -e s/OSCARVERSION/$OSCAR_VERSION/g $file > $file.out
@@ -235,6 +236,7 @@ if test "$want_srpms" = "regular" -o -z "$want_srpms"; then
 
     egrep -v /SRPMS/ dist/config_files_list.m4 > newfile.$$
     cp newfile.$$ dist/config_files_list.m4
+    rm -f newfile.$$
 
     # Now re-run the tools to get everything proper in the configure
     # script
@@ -245,6 +247,7 @@ if test "$want_srpms" = "regular" -o -z "$want_srpms"; then
     autoconf
     echo " - Re-running automake"
     automake -a --copy
+    rm -rf autom4te.cache
 
 elif test "$want_srpms" = "only"; then
     echo ONLY
