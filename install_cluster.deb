@@ -181,11 +181,11 @@ $ENV{LC_TIME} = "C";
 $ENV{PATH} = $ENV{PATH} .
     ':/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin';
 
-# Sanity check: ensure that /tftpboot/rpm exists
+# Sanity check: ensure that the local debian repository exists
 
-oscar_log_subsection("Quick sanity check for /tftpboot/rpm");
-if (! -d "/tftpboot/rpm") {
-    print("ERROR: /tftpboot/rpm directory does not exist.  You must create this directory\nand copy all of your distro RPMs there before running install_cluster.\n");
+oscar_log_subsection("Quick sanity check for the local Debian repository in /tftpboot/debian");
+if (! -d "/tftpboot/debian/testing") {
+    print("ERROR: the local Debian repository in the /tftpboot/debian directory does not exist.  You must create this repository running the script "create_local_debian_repository.\n");
     die("Cannot continue");
 }
 
