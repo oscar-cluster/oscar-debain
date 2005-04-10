@@ -64,13 +64,23 @@ closedir PREREQDIR;
 # Now read in the share/prereqs/order.txt file
 
 my @ordered_prereqs;
-if (-f "$prefix/order.txt") {
+my ($distn, $distv) = which_distro_server();
+
+if ( $distn eq 'debian' ) {
+  if (-f "$prefix/order.deb.txt") {
+    open ORDER, "$prefix/order.deb.txt" or
+    croak("Could't open $prefix/order.deb.txt for reading");
+  }
+}
+else {
+  if (-f "$prefix/order.txt") {
     open ORDER, "$prefix/order.txt" or
         croak("Could't open $prefix/order.txt for reading");
-    @ordered_prereqs = <ORDER>;
-    chomp @ordered_prereqs;
-    close(ORDER);
+  }
 }
+@ordered_prereqs = <ORDER>;
+chomp @ordered_prereqs;
+close(ORDER);
 
 # Keep a list of which prereqs we've processed already
 
