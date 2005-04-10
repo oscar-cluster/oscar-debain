@@ -41,8 +41,9 @@ croak "You must be 'root' to run this script.  Aborting" if ($< != 0);
 # Second, find the binary package format
 
 my $adapter = shift;
+my ($distn, $distv) = which_distro_server();
 
-if ( !system("dpkg-deb --help >/dev/null 2>/dev/null") )
+if ( $distn eq 'debian' )
   {
     oscar_log_subsection("Using Deb packages.");
     system ("./install_cluster.deb $adapter\n");
