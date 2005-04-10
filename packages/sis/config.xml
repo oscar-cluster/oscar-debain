@@ -67,11 +67,11 @@
       <rpm>syslinux</rpm>
       <rpm>systemimager-boot-i386-standard</rpm>
   </rpmlist>
-<!--  <rpmlist>
+  <rpmlist>
       <filter group="oscar_server"/>
       <filter architecture="ia64"/>
-      <rpm>systemimager-ia64boot-standard</rpm>
+      <rpm>systemimager-boot-ia64-standard</rpm>
       <rpm>systemimager-server</rpm>
       <rpm>libxml-simple-perl</rpm>
-  </rpmlist>-->
+  </rpmlist>
 </oscar>
