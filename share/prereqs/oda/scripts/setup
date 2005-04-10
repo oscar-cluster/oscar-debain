@@ -18,14 +18,15 @@ use Cwd qw(chdir cwd);
 use lib cwd() . "/../lib";
 use vars qw($VERSION);
 use OSCAR::Logger;
+use OSCAR::Distro;
+
+my ($distn, $distv) = which_distro_server();
 
 oscar_log_section ("Setup ODA...");
-if ( !system("dpkg-deb --help >/dev/null 2>/dev/null") )
-  {
+if ( $distn eq 'debian' ) {
     oscar_log_subsection ("Running setup for Deb based distro...");
     system ("$ENV{OSCAR_HOME}/share/prereqs/oda/scripts/setup.deb\n");
   }
-# if ( !system("rpm --help >/dev/null 2>/dev/null") )
 else
   {
     oscar_log_subsection ("Running setup for RPM based distro...");
