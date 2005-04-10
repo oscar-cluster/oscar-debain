@@ -56,7 +56,7 @@ if ($distro_name ne 'debian') {
     $PKG_SEPARATOR = '-';
 } else {
     # debian
-    $RPM_POOL = $ENV{OSCAR_RPMPOOL} || '/tftpboot/debian/testing/main/binary-i386';
+    $RPM_POOL = $ENV{OSCAR_RPMPOOL} || '/tftpboot/debian';
     $PKG_EXTENSION = ".deb";
     $PKG_DIRNAME = "Debs";
     $PKG_SEPARATOR = '_';
