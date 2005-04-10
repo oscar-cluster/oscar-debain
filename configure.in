@@ -177,6 +177,7 @@ AC_CONFIG_FILES([
     share/prereqs/oda/Makefile
     share/prereqs/oda/scripts/Makefile
     share/prereqs/packman/Makefile
+    share/prereqs/packman/Debs/Makefile
     share/prereqs/packman/RPMS/Makefile
     share/prereqs/packman/SRPMS/Makefile
     share/prereqs/packman/scripts/Makefile
