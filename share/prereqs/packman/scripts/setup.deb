@@ -36,6 +36,9 @@ for deb in $debs; do
 #	fi
 done
 
+deb_filename="`ls -1 $OSCAR_HOME/share/prereqs/packman/Debs/$debs\_[0-9]*deb`"
+cp $OSCAR_HOME/share/prereqs/packman/Debs/$debs\_[0-9]*deb /tftpboot/debian
+$OSCAR_HOME/update_local_debian_repository
 if test -n "$need_to_install"; then
 	echo "Installing: $need_to_install"
 	apt-get install $need_to_install --force-yes
