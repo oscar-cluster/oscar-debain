@@ -45,7 +45,7 @@
       <filter group="oscar_server"/>
       <rpm>systeminstaller</rpm>
 <!--      <rpm>systeminstaller-x11</rpm>-->
-      <rpm>libappconfig</rpm>
+      <rpm>libappconfig-perl</rpm>
       <rpm>llibmldbm-perl</rpm>
 <!--	  <rpm>perl-MLDBM</rpm>-->
       <rpm>systemimager-server</rpm>
