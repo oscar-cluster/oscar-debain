@@ -24,5 +24,4 @@
 #   This is the oscar installation program.  It must be called with
 #   one argument which is the installation network device
 
-mkdir -p /tftpboot/debian/testing/main/binary-i386
-mkdir -p /tftpboot/debian/testing/main/source
+mkdir -p /tftpboot/debian
