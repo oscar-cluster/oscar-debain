@@ -22,7 +22,7 @@ use OSCAR::Distro;
 
 my ($distn, $distv) = which_distro_server();
 
-oscar_log_section ("Setup ODA...");
+oscar_log_section ("Setup Perl-Tk...");
 if ( $distn eq 'debian' ) {
   oscar_log_subsection ("Running setup for RPM based distro...");
   system ("$ENV{OSCAR_HOME}/share/prereqs/perl-Tk/scripts/setup.deb\n");
