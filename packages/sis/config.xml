@@ -46,7 +46,7 @@
       <rpm>systeminstaller</rpm>
 <!--      <rpm>systeminstaller-x11</rpm>-->
       <rpm>libappconfig-perl</rpm>
-      <rpm>llibmldbm-perl</rpm>
+      <rpm>libmldbm-perl</rpm>
 <!--	  <rpm>perl-MLDBM</rpm>-->
       <rpm>systemimager-server</rpm>
 <!--      <rpm>systemimager-flamethrower</rpm>-->
