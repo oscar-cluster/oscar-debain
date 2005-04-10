@@ -37,6 +37,7 @@ use File::Basename;
 use Data::Dumper;
 use vars qw($RPMTABLE);
 use Carp;
+use OSCAR::Distro;
 
 sub do_it_or_die {
     my ( $command, $results_ref, $error ) = @_;
