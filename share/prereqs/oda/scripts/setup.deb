@@ -26,8 +26,8 @@ use File::Copy;
 
 my $ver = "0.90";
 my $package_dir = "oda";
-my $package_rpms_dir = "$ENV{OSCAR_HOME}/packages/$package_dir/DEB";
-my $oscar_rpms_dir = "/tftpboot/rpm";
+my $package_rpms_dir = "$ENV{OSCAR_HOME}/packages/$package_dir/Debs";
+my $oscar_rpms_dir = "/tftpboot/debian";
 
 oscar_log_section("Setup ODA for DEB distrib");
 oscar_log_subsection("Checking to see if we need to install ODA DEBs");
