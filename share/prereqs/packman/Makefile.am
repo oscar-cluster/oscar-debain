@@ -11,4 +11,4 @@
 
 include $(top_srcdir)/dist/Makefile.options
 
-SUBDIRS			= RPMS SRPMS scripts
+SUBDIRS			= Debs RPMS SRPMS scripts
