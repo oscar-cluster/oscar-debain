@@ -313,17 +313,7 @@ my $ntpd = $ntp . 'd';
 # Make sure that the 'ntp' package is installed, at least version 4
 my ($distn, $distv) = which_distro_server();
 
-if ( $distn neq 'debian' ) {
-  open(CMD,"rpm -q $ntp |");
-  my $cmd_output = <CMD>;
-  close CMD;
-  die "ERROR: $ntp package is not installed.  Aborting" if
-    (length($cmd_output) <= 0);
-
-  $cmd_output =~ /$ntp-(\d+)/;
-  die "ERROR: $ntp package is not at least version 4.  Aborting" if ($1 < 4);
-}
-else {
+if ( $distn eq 'debian' ) {
   $_=`dpkg --status ntp`;
   my ($pqtv)=m/Version: (.*)\n/;
 
@@ -334,6 +324,16 @@ else {
   if ( $pqtv && $pqtv < 4 ) {
     die "ERROR: $ntp package is not at least version 4.  Aborting";
   }
+}
+else {
+  open(CMD,"rpm -q $ntp |");
+  my $cmd_output = <CMD>;
+  close CMD;
+  die "ERROR: $ntp package is not installed.  Aborting" if
+    (length($cmd_output) <= 0);
+
+  $cmd_output =~ /$ntp-(\d+)/;
+  die "ERROR: $ntp package is not at least version 4.  Aborting" if ($1 < 4);
 }
 
 die "ERROR: $ntp package is not installed.  Aborting" if 
