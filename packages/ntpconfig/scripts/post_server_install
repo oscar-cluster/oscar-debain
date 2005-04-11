@@ -341,12 +341,6 @@ else {
   die "ERROR: $ntp package is not at least version 4.  Aborting" if ($1 < 4);
 }
 
-die "ERROR: $ntp package is not installed.  Aborting" if 
-  (length($cmd_output) <= 0);
-
-$cmd_output =~ /$ntp-(\d+)/;
-die "ERROR: $ntp package is not at least version 4.  Aborting" if ($1 < 4);
-
 # Set the list of ntp servers
 setNTPServerList();
 
