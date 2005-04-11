@@ -13,6 +13,7 @@ my $versionstring = '$Id$'; # RCS version string of the script
 
 use lib "$ENV{OSCAR_HOME}/lib";
 use OSCAR::Package;
+use OSCAR::Distro;
 use Getopt::Long;   # Used to get command line options
 
 # These are public ntp servers for use by the server.
