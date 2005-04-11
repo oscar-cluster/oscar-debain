@@ -36,9 +36,12 @@
 
   <rpmlist>
       <filter group="oscar_server"/>
-      <rpm>ganglia-monitor-core-gmetad</rpm>
+<!--      <rpm>ganglia-monitor-core-gmetad</rpm>
       <rpm>ganglia-webfrontend</rpm>
       <rpm>rrdtool</rpm>
+-->
+    <rpm>libganglia1</rpm>
+    <rpm>ganglia-monitor</rpm>
   </rpmlist>
 
   <servicelist>

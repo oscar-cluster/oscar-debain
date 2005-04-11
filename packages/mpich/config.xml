@@ -43,10 +43,14 @@ MPI (http://www.mpi-forum.org), the Standard for message-passing
 libraries.</description>
 
   <rpmlist>
-    <rpm>mpich-ch_p4-gcc-oscar</rpm>
+<!--    <rpm>mpich-ch_p4-gcc-oscar</rpm>
     <rpm>mpich-ch_p4-gcc-oscar-devel</rpm>
     <rpm>mpich-ch_p4-gcc-oscar-module</rpm>
-  </rpmlist>
+-->
+    <rpm>mpich-bin</rpm>
+    <rpm>libmpich1.0-dev</rpm>
+    <rpm>libmpich1.0</rpm>
+</rpmlist>
 
   <provides>
     <type>package</type>

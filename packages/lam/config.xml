@@ -98,6 +98,13 @@ visualized either at runtime or post-mortem.</description>
   </rpmlist>
 
   <rpmlist>
+    <filter distribution='debian' />
+    <rpm>lam4</rpm>
+    <rpm>lam4-dev</rpm>
+    <rpm>lam-runtime</rpm>
+  </rpmlist>
+
+  <rpmlist>
     <!-- Distributions that don't provides libaio -->
     <!-- FIXME ??? Ben's update : libaio not needed by lam but by lam-gm ???-->
     <filter distribution='mandrake' />
