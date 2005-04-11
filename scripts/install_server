@@ -34,6 +34,7 @@ use OSCAR::PackageBest;
 use OSCAR::Network;
 use OSCAR::Logger;
 use OSCAR::Database;
+use OSCAR::Distro;
 use Carp;
 use Data::Dumper;
 
@@ -162,7 +163,15 @@ oscar_log_subsection("Updating rsyncd.conf");
 update_rsyncd_conf($ip,$netmask) or croak("Couldn't update rsyncd.conf file");
 
 oscar_log_subsection("Refreshing services");
-!system("/etc/init.d/nfs start") or croak("Couldn't start nfs");
+my ($distn, $distv) = which_distro_server();
+
+if ( $distn eq 'debian' ) {
+  !system("/etc/init.d/nfs-common start") or croak("Couldn't start nfs"); 
+  # do we have to start nfs-user-server or nfs-kernel-user?
+}
+else {
+  !system("/etc/init.d/nfs start") or croak("Couldn't start nfs");
+}
 !system("exportfs -a") or croak("Couldn't refresh nfs exports");
 !system("/etc/init.d/sshd start") or croak("Couldn't start sshd");
 !system("chkconfig --level 345 sshd on");
