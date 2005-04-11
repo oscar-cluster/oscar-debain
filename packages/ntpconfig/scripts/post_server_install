@@ -334,7 +334,10 @@ else {
     (length($cmd_output) <= 0);
 
   $cmd_output =~ /$ntp-(\d+)/;
-  die "ERROR: $ntp package is not at least version 4.  Aborting" if ($1 < 4);
+  # I desactivate the version check because the version number for the ntp package
+  # is quite strange and the perl command does not allow to have the version even if
+  # in testing the ntp version is > 4
+  # die "ERROR: $ntp package is not at least version 4.  Aborting" if ($1 < 4);
 }
 
 die "ERROR: $ntp package is not installed.  Aborting" if 
