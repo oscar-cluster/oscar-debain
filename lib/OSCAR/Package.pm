@@ -43,7 +43,8 @@ use Carp;
              run_pkg_script run_pkg_user_test
              run_pkg_script_chroot rpmlist install_packages copy_pkgs 
              pkg_config_xml list_selected_packages getSelectionHash
-             isPackageSelectedForInstallation getConfigurationValues);
+             isPackageSelectedForInstallation getConfigurationValues
+	     get_package_version);
 $VERSION = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
 # Trying to figure out the best way to set this.
@@ -770,6 +771,31 @@ sub getConfigurationValues # ($package) -> $valueshashref
     }
 
   return undef;
+}
+
+sub get_package_version # ($package)
+{
+  my ($distn, $distv) = which_distro_server();
+  my version;
+
+  if ( $distn eq 'debian' ) {
+    $_=`dpkg --status ntp`;
+    version=m/Version: (.*)\n/;
+
+    if ( !$version ) {
+      die "ERROR: $ntp package is not installed.  Aborting";
+  }
+  else {
+    open(CMD,"rpm -q $ntp |");
+    my $cmd_output = <CMD>;
+    close CMD;
+    die "ERROR: $ntp package is not installed.  Aborting" if
+      (length($cmd_output) <= 0);
+
+    $cmd_output =~ /$ntp-(\d+)/;
+    die "ERROR: $ntp package is not at least version 4.  Aborting" if ($1 < 4);
+  }
+return $version;
 }
 
 1;
