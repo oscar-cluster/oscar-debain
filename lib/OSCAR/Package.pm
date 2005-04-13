@@ -773,27 +773,26 @@ sub getConfigurationValues # ($package) -> $valueshashref
   return undef;
 }
 
-sub get_package_version # ($package)
+sub get_package_version # ($package) -> package name
 {
   my ($distn, $distv) = which_distro_server();
   my version;
 
   if ( $distn eq 'debian' ) {
-    $_=`dpkg --status ntp`;
+    $_=`dpkg --status $package`;
     version=m/Version: (.*)\n/;
 
     if ( !$version ) {
-      die "ERROR: $ntp package is not installed.  Aborting";
+      die "ERROR: $package package is not installed.  Aborting";
   }
   else {
-    open(CMD,"rpm -q $ntp |");
+    open(CMD,"rpm -q $package |");
     my $cmd_output = <CMD>;
     close CMD;
-    die "ERROR: $ntp package is not installed.  Aborting" if
+    die "ERROR: $package package is not installed.  Aborting" if
       (length($cmd_output) <= 0);
 
-    $cmd_output =~ /$ntp-(\d+)/;
-    die "ERROR: $ntp package is not at least version 4.  Aborting" if ($1 < 4);
+    $version =~ /$ntp-(\d+)/;
   }
 return $version;
 }
