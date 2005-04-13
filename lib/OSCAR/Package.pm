@@ -775,24 +775,28 @@ sub getConfigurationValues # ($package) -> $valueshashref
 
 sub get_package_version # ($package) -> package name
 {
-  my ($distn, $distv) = which_distro_server();
-  my version;
+  my $package = shift;
+  my $version = -1;
 
-  if ( $distn eq 'debian' ) {
+  if ( $distro_name eq 'debian' ) {
     $_=`dpkg --status $package`;
-    version=m/Version: (.*)\n/;
-
-    if ( !$version ) {
-      die "ERROR: $package package is not installed.  Aborting";
+    # two ways to set a package number
+    m/Version: (\d+):(\d+).(.*)\n/;
+    if (length($2) > 0) {
+      $version=$2;
+    }
+    else {
+      m/Version: (\d+).(.*)\n/;
+      $version=$1;
+    }
   }
   else {
     open(CMD,"rpm -q $package |");
     my $cmd_output = <CMD>;
     close CMD;
-    die "ERROR: $package package is not installed.  Aborting" if
-      (length($cmd_output) <= 0);
-
-    $version =~ /$ntp-(\d+)/;
+    if (length($cmd_output) <= 0) {
+      $version =~ /$package-(\d+)/;
+    }
   }
 return $version;
 }
