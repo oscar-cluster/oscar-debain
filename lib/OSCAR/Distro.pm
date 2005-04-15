@@ -162,6 +162,51 @@ CASE: {
 
 }
 
+sub which_perltk_name 
+{
+  my $name;
+  my $version;
+  which_distro_server ($name, $version);
+
+  CASE: {
+    # redhat
+    ($name eq "redhat") && do{
+      return "mysqld";
+      last CASE;
+    };
+
+    # rhas
+    ($name eq "rhas") && do{
+      return "mysqld";
+      last CASE;
+    };
+
+    # fedora
+    ($name eq "fedora") && do{
+      return "mysqld";
+      last CASE;
+    };
+
+    # mandrake
+    ($name eq "mandrake") && do{
+      return "mysql";
+      last CASE;
+    };
+
+    # suse
+    ($name eq "suse") && do{
+      return "mysql";
+      last CASE;
+    };
+
+    # debian
+    ($name eq "debian") && do{
+      return "mysql";
+      last CASE;
+    };
+  }
+}
+
 sub get_pkg_dir 
 {
   my dir = shift;
