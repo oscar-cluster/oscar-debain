@@ -166,42 +166,42 @@ sub which_perltk_name
 {
   my $name;
   my $version;
-  which_distro_server ($name, $version);
+  ($name, $version) = which_distro_server ();
 
   CASE: {
     # redhat
     ($name eq "redhat") && do{
-      return "mysqld";
+      return "perl-Tk";
       last CASE;
     };
 
     # rhas
     ($name eq "rhas") && do{
-      return "mysqld";
+      return "perl-Tk";
       last CASE;
     };
 
     # fedora
     ($name eq "fedora") && do{
-      return "mysqld";
+      return "perl-Tk";
       last CASE;
     };
 
     # mandrake
     ($name eq "mandrake") && do{
-      return "mysql";
+      return "perl-Tk";
       last CASE;
     };
 
     # suse
     ($name eq "suse") && do{
-      return "mysql";
+      return "perl-Tk";
       last CASE;
     };
 
     # debian
     ($name eq "debian") && do{
-      return "mysql";
+      return "perl-tk";
       last CASE;
     };
   }
@@ -210,7 +210,10 @@ sub which_perltk_name
 sub get_pkg_dir 
 {
   my $dir = shift;
+  my $name;
+  my $version;
 
+  ($name, $version) = which_distro ();
   if ($name eq "debian") {
     return "$dir/Debs";
   }

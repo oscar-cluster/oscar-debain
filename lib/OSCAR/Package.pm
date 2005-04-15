@@ -720,14 +720,14 @@ sub copy_rpms # ($pkgdir) -> 1|undef
 
 sub copy_pkg
 {
-  my pkg = shift;
+  my $pkg = shift;
 
   my $filename = basename($pkg);
   # Copy the file only if it isn't in the destination directory
   if ( !-e "$RPM_POOL/$filename")
     {
-      print "Copying $file to $RPM_POOL\n";
-      copy("$file", "$RPM_POOL/$filename") or return undef;
+      print "Copying $pkg to $RPM_POOL\n";
+      copy("$pkg", "$RPM_POOL/$filename") or return undef;
     }
   return 1;
 }
@@ -975,13 +975,14 @@ sub get_package_version # ($package) -> package name
 sub get_pkg_list_in_dir
 {
   my $dir = shift;
+  my @pkgs;
 
   opendir(DIR, "$dir") || croak("Can't open $dir");
   if ( $distro_name eq 'debian' ) {
-    my @pkgs = grep { /.deb/ } readdir(DIR);
+    @pkgs = grep { /.deb/ } readdir(DIR);
   }
   else {
-    my @pkgs = grep { /.rpm/ } readdir(DIR);
+    @pkgs = grep { /.rpm/ } readdir(DIR);
   }
   closedir DIR;
 
