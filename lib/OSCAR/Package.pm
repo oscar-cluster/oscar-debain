@@ -984,6 +984,8 @@ sub get_pkg_list_in_dir
     my @pkgs = grep { /.rpm/ } readdir(DIR);
   }
   closedir DIR;
+
+  return @pkgs;
 }
 								      
 1;
