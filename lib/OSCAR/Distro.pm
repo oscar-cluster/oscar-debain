@@ -31,7 +31,7 @@ use strict;
 use vars qw($VERSION @EXPORT);
 use Carp;
 use base qw(Exporter);
-@EXPORT = qw(which_distro which_distro_server which_mysql_name);
+@EXPORT = qw(which_distro which_distro_server which_mysql_name get_pkg_dir);
 
 $VERSION = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
@@ -160,6 +160,18 @@ CASE: {
 
       }
 
+}
+
+sub get_pkg_dir 
+{
+  my dir = shift;
+
+  if ($name eq "debian") {
+    return $dir"/Debs";
+  }
+  else {
+    return 4dir"/RPMS";
+  }
 }
 
 1;

@@ -40,11 +40,11 @@ use XML::Simple;
 use Carp;
 
 @EXPORT = qw(list_installable_packages list_installable_package_dirs 
-             run_pkg_script run_pkg_user_test
+             run_pkg_script run_pkg_user_test copy_rpms remove_rpms
              run_pkg_script_chroot rpmlist install_packages copy_pkgs 
              pkg_config_xml list_selected_packages getSelectionHash
              isPackageSelectedForInstallation getConfigurationValues
-	     get_package_version);
+             run_pkg_apitest_test copy_pkg get_package_version);
 $VERSION = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
 # Trying to figure out the best way to set this.
@@ -57,7 +57,7 @@ if ($distro_name ne 'debian') {
     $PKG_SEPARATOR = '-';
 } else {
     # debian
-    $RPM_POOL = $ENV{OSCAR_RPMPOOL} || '/tftpboot/debian';
+    $RPM_POOL = $ENV{OSCAR_RPMPOOL} || '/tftpboot/deb';
     $PKG_EXTENSION = ".deb";
     $PKG_DIRNAME = "Debs";
     $PKG_SEPARATOR = '_';
@@ -325,7 +325,12 @@ sub run_pkg_user_test {
             if ($uid == $>) {
                 $rc = system("$script $args");
             } else {
-                $rc = system("su --command='OSCAR_TESTPRINT=$ENV{OSCAR_TESTPRINT} OSCAR_HOME=$ENV{OSCAR_HOME} $script $args' - $user");
+                if( defined($ENV{OSCAR_PACKAGE_TEST_HOME}) ) {
+                     # TJN: this EnvVar is used by 'test_user' scripts. 
+                    $rc = system("su --command='OSCAR_TESTPRINT=$ENV{OSCAR_TESTPRINT} OSCAR_HOME=$ENV{OSCAR_HOME} OSCAR_PACKAGE_TEST_HOME=$ENV{OSCAR_PACKAGE_TEST_HOME} $script $args' - $user");
+                } else {
+                    $rc = system("su --command='OSCAR_TESTPRINT=$ENV{OSCAR_TESTPRINT} OSCAR_HOME=$ENV{OSCAR_HOME} $script $args' - $user");
+                }
             }
             if($rc) {
                 my $realrc = $rc >> 8;
@@ -335,6 +340,61 @@ sub run_pkg_user_test {
     }
     return 1;
 }
+
+
+#
+# APItest Additions
+#  This runs an APItest file (or batch file).  Expected that this 
+#  will be run as 'root', but can use another user if needed.
+#
+# TODO Fix work arounds for current release of APItest v0.2.5-1
+ 
+sub run_pkg_apitest_test
+{
+	use File::Spec;
+
+	my ($script, $user, $verbose) = @_;
+	my $apitest = "/usr/local/apitest/apitest";    # FIXME: hardcoded path
+	my $rc = 0;
+
+
+	if (-e $script) {
+		oscar_log_subsection("About to run APItest: $script") if $verbose;
+
+		#FIXME: TJN: work around path problem of APItest that 
+		#       dies when called from other location than CWD of file.
+		#       So must do: (cd $cpath; apitest test_file)
+
+		my ($vol,$path,$file) = File::Spec->splitpath( $script );
+		my $cpath = File::Spec->canonpath( $path );
+
+		my $uid=getpwnam($user);
+		if ($uid == $>) {
+			#FIXME: work around path problem of APItest
+			#$rc = system("$apitest -T -f $script");
+			my $cmd = "(cd $cpath && $apitest -T -f $file)";
+			$rc = system($cmd);
+		} else {
+			#FIXME: work around path problem of APItest (cd $cpath; ...)
+			#$rc = system("su --command='OSCAR_HOME=$ENV{OSCAR_HOME} $apitest -T -f $script' - $user");
+			my $cmd = "su --command='OSCAR_HOME=$ENV{OSCAR_HOME} (cd $cpath && $apitest -T -f $file)' - $user";
+			$rc = system($cmd);
+		}
+	}
+	else {
+		oscar_log_subsection("Warning: not exist '$script' ") if $verbose;
+	}
+
+	if($rc) {
+		my $realrc = $rc >> 8;
+		carp("Script APItest $script exited badly with exit code '$realrc'") if $verbose;
+		return 0;
+	}
+
+	return 1;
+}
+
+
 #
 # This returns the type of rpm list for a package file.  Use this
 # order of precedence in looking for the RPM list:
@@ -458,6 +518,7 @@ sub install_packages {
     return 1;
 }
 
+# FIXME OSCAR <= 4.1 doesn't use this; no idea why it's here FIXME
 sub server_version_goodenough {
     my ($file) = @_;
     my $output1 = `rpm -qp --qf '\%{NAME} \%{VERSION} \%{RELEASE}' $file`;
@@ -548,6 +609,7 @@ sub read_all_pkg_config_xml_files {
 #       oscar_log_subsection("Reading $config");
             $PACKAGE_CACHE->{$pkg} = eval { $xs->XMLin($config); };
             if ($@) {
+            oscar_log_subsection($@);
             oscar_log_subsection("WARNING! The config.xml file for $pkg is invalid.  Creating an empty one...");
             $PACKAGE_CACHE->{$pkg} = make_empty_xml($pkg);
             } else {
@@ -582,7 +644,7 @@ sub copy_pkgs # ($pkgdir) -> 1|undef
                                                                                 
   # Get a list of all OSCAR/OPD packages
   my @packagedirs = files_in_dir($pkgdir);
-                                                                                
+
   foreach my $dir (@packagedirs) 
     {
       # For each package, get a list of its RPMs
@@ -594,7 +656,7 @@ sub copy_pkgs # ($pkgdir) -> 1|undef
             {
               my $filename = basename($file);
               # Copy the file only if it isn't in the destination directory
-              if (!-e "$RPM_POOL/$filename") 
+              if ( !-e "$RPM_POOL/$filename")
                 {
                   print "Copying $file to $RPM_POOL\n";
                   copy("$file", "$RPM_POOL/$filename") or return undef;
@@ -602,11 +664,119 @@ sub copy_pkgs # ($pkgdir) -> 1|undef
             }
         }
     }
-  if ($distro_name eq 'debian') {
-    print "Updating the local Debian repository...\n";
-    !system ("$ENV{OSCAR_HOME}/update_local_debian_repository")
-    or (carp("Couldn't run $ENV{OSCAR_HOME}/update_local_debian_repository"), return undef);
+  return 1; # Made it this far?  Success!
+}
+
+
+#########################################################################
+#  Subroutine: copy_rpms                                                #
+#  Parameters: A 'packages' directory, usually $OSCAR_HOME/packages or  #
+#              /var/lib/oscar/packages/                                 #
+#  Returns   : 1 if successful, undef if failure                        #
+#  This subroutine copies all of the RPMs for all packages under the    #
+#  passed in 'packages' directory to the $RPM_POOL directory (which is  #
+#  typically /tftpboot/rpm) only if the packages are selected.          #
+#########################################################################
+sub copy_rpms # ($pkgdir) -> 1|undef
+{
+  my ($pkgdir) = @_;
+                                                                                
+  # Get a list of all OSCAR/OPD packages
+  my @packagedirs = files_in_dir($pkgdir);
+
+  # Only selected packages should be copied to /tftpboot/rpm
+  # Author : dikim@osl.iu.edu
+  my @selected_packages = list_selected_packages("all");
+  my %selected_pkg_hash = ();
+  foreach my $one_pkg (@selected_packages){
+      $selected_pkg_hash{$one_pkg} = 1;
   }
+                                                                                
+  foreach my $dir (@packagedirs) 
+    {
+      my $one_pkg = basename($dir);
+      if ( $selected_pkg_hash{$one_pkg} == 1 ){
+      # For each package, get a list of its RPMs
+      my @files = files_in_dir("$dir/$PKG_DIRNAME");
+      foreach my $file (@files) 
+        {
+          # NOTE: this is slightly broken... not anchored to end of string with $
+          if ($file =~ /$PKG_EXTENSION/)
+            {
+              my $filename = basename($file);
+              # Copy the file only if it isn't in the destination directory
+              if ( !-e "$RPM_POOL/$filename")
+                {
+                  print "Copying $file to $RPM_POOL\n";
+                  copy("$file", "$RPM_POOL/$filename") or return undef;
+                }
+            }
+        }
+      }
+    }
+  return 1; # Made it this far?  Success!
+}
+
+sub copy_pkg
+{
+  my pkg = shift;
+
+  my $filename = basename($pkg);
+  # Copy the file only if it isn't in the destination directory
+  if ( !-e "$RPM_POOL/$filename")
+    {
+      print "Copying $file to $RPM_POOL\n";
+      copy("$file", "$RPM_POOL/$filename") or return undef;
+    }
+  return 1;
+}
+
+#########################################################################
+#  Subroutine: remove_rpms                                              #
+#  Parameters: A 'packages' directory, usually $OSCAR_HOME/packages or  #
+#              /var/lib/oscar/packages/                                 #
+#  Returns   : 1 if successful, undef if failure                        #
+#  This subroutine removes all of the RPMs for all unselected packages  #
+#  passed in 'packages' directory from the $RPM_POOL directory(which is #
+#  typically /tftpboot/rpm).                                            #
+#########################################################################
+sub remove_rpms # ($pkgdir) -> 1|undef
+{
+  my ($pkgdir) = @_;
+                                                                                
+  # Get a list of all OSCAR/OPD packages
+  my @packagedirs = files_in_dir($pkgdir);
+
+  # Only unselected packages should be removed from /tftpboot/rpm
+  # Author : dikim@osl.iu.edu
+  my @selected_packages = list_selected_packages("all");
+  my %selected_pkg_hash = ();
+  foreach my $one_pkg (@selected_packages){
+      $selected_pkg_hash{$one_pkg} = 1;
+  }
+                                                                                
+  foreach my $dir (@packagedirs) 
+    {
+      my $one_pkg = basename($dir);
+      if ( $selected_pkg_hash{$one_pkg} != 1 ){
+      # For each package, get a list of its RPMs
+      my @files = files_in_dir("$dir/$PKG_DIRNAME");
+      foreach my $file (@files) 
+        {
+          # NOTE: this is slightly broken... not anchored to end of string with $
+          if ($file =~ /$PKG_EXTENSION/)
+            {
+              my $filename = basename($file);
+              # Remove the file only if it isn't in the destination directory
+              if ( -e "$RPM_POOL/$filename")
+                {
+                  print "Deleting $filename from $RPM_POOL\n";
+                  move("$RPM_POOL/$filename", "$dir/$PKG_DIRNAME") or return undef;
+                }
+            }
+        }
+      }
+    }
   return 1; # Made it this far?  Success!
 }
 
@@ -780,7 +950,7 @@ sub get_package_version # ($package) -> package name
 
   if ( $distro_name eq 'debian' ) {
     $_=`dpkg --status $package`;
-    # two ways to set a package number
+    # two ways to set a package number	  
     m/Version: (\d+):(\d+).(.*)\n/;
     if (length($2) > 0) {
       $version=$2;
@@ -798,7 +968,7 @@ sub get_package_version # ($package) -> package name
       $version =~ /$package-(\d+)/;
     }
   }
-return $version;
+  return $version;
 }
-
+								      
 1;
