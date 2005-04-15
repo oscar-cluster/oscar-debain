@@ -30,7 +30,7 @@ Author: Jeremy Enos jenos@ncsa.uiuc.edu
 </description>
   <url>http://supercluster.org/projects/torque</url>
   <rpmlist>
-      <rpm>torque</rpm>
+<!--      <rpm>torque</rpm> -->
       <rpm>torque-mom</rpm>
       <rpm>torque-client</rpm>
   </rpmlist>
