@@ -209,13 +209,13 @@ sub which_perltk_name
 
 sub get_pkg_dir 
 {
-  my dir = shift;
+  my $dir = shift;
 
   if ($name eq "debian") {
-    return $dir"/Debs";
+    return "$dir/Debs";
   }
   else {
-    return 4dir"/RPMS";
+    return "$dir/RPMS";
   }
 }
 
