@@ -46,7 +46,7 @@ if ( get_package_version ($pkg) <= 0 ) {
   } else {
     my @rpms = get_pkg_list_in_dir ($rpmdir);
     foreach $file (@rpms) {
-      oscar_log_subsection("Copying $rpmdir/$file to the local package repository\n")
+      oscar_log_subsection("Copying $rpmdir/$file to the local package repository\n");
       copy_pkg ($file);
     }
     if ( $distn eq 'mandrake' ) {
