@@ -31,7 +31,7 @@ use strict;
 use vars qw($VERSION @EXPORT);
 use Carp;
 use base qw(Exporter);
-@EXPORT = qw(which_distro which_distro_server which_mysql_name get_pkg_dir);
+@EXPORT = qw(which_distro which_distro_server which_mysql_name get_pkg_dir which_perltk_name);
 
 $VERSION = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
