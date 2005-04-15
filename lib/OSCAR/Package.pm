@@ -44,7 +44,8 @@ use Carp;
              run_pkg_script_chroot rpmlist install_packages copy_pkgs 
              pkg_config_xml list_selected_packages getSelectionHash
              isPackageSelectedForInstallation getConfigurationValues
-             run_pkg_apitest_test copy_pkg get_package_version);
+             run_pkg_apitest_test copy_pkg get_package_version
+	     get_pkg_list_in_dir);
 $VERSION = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
 # Trying to figure out the best way to set this.
@@ -969,6 +970,20 @@ sub get_package_version # ($package) -> package name
     }
   }
   return $version;
+}
+
+sub get_pkg_list_in_dir
+{
+  my $dir = shift;
+
+  opendir(DIR, "$dir") || croak("Can't open $dir");
+  if ( $distro_name eq 'debian' ) {
+    my @pkgs = grep { /.deb/ } readdir(DIR);
+  }
+  else {
+    my @pkgs = grep { /.rpm/ } readdir(DIR);
+  }
+  closedir DIR;
 }
 								      
 1;
