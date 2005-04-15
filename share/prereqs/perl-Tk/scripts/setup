@@ -38,16 +38,17 @@ foreach my $dir (@rpmvers) {
 }
 oscar_log_subsection("Checking to see if we need to install Perl-Tk\n");
 
-my perl-tk-pkg = which_perltk_name ();
-if ( get_package_version ($pkg) <= 0 ) {
+my $perl_tk_pkg = which_perltk_name ();
+if ( get_package_version ($perl_tk_pkg) <= 0 ) {
   oscar_log_subsection("We do need to install perl-Tk\n");
+  my $match = install_packages ($perl_tk_pkg);
   if ( $match == 0 ) {
     croak("Can't install perl-Tk for perl $perl_version, we have @rpmvers");
   } else {
     my @rpms = get_pkg_list_in_dir ($rpmdir);
     foreach $file (@rpms) {
-      oscar_log_subsection("Copying $rpmdir/$file to the local package repository\n");
-      copy_pkg ($file);
+      oscar_log_subsection("Copying $rpmdir/$perl_tk_pkg to the local package repository\n");
+      copy_pkg ($perl_tk_pkg);
     }
     if ( $distn eq 'mandrake' ) {
       if ( $distv eq '10.0' ) {
