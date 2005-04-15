@@ -23,5 +23,5 @@
 #   This is the oscar installation program.  It must be called with
 #   one argument which is the installation network device
 
-cd /tftpboot ; dpkg-scanpackages debian /dev/null | gzip -f9 > debian/Packages.gz 
+cd /tftpboot ; dpkg-scanpackages deb /dev/null | gzip -f9 > deb/Packages.gz 
 apt-get update
