@@ -50,6 +50,8 @@ routines.</description>
 
   <rpmlist>
     <rpm>pvm</rpm>
-    <rpm>pvm-modules-oscar</rpm>
+<!--    <rpm>pvm-modules-oscar</rpm> -->
+    <rpm>pvm-dev</rpm>
+    <rpm>xpvm</rpm>
   </rpmlist>
 </oscar>
