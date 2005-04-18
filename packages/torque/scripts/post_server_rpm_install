@@ -22,6 +22,7 @@ use strict;
 use Carp;
 use lib '/usr/lib/systeminstaller';
 use SystemInstaller::Machine;
+use OSCAR::Distro;
 
 ######################################################################
 #  Check to see if 'PBS Server' is running.  If not, then start it.  #
@@ -48,7 +49,13 @@ system('/sbin/chkconfig --del pbs_sched');
 system('/sbin/chkconfig --add pbs_server');
 
 print "...updating xpbsmonrc file\n";
-my $xpbsmonrc = "/opt/pbs/lib/xpbsmon/xpbsmonrc";
+my ($distn, $distv) = which_distro_server();
+if ( $distn eq 'debian' ) {
+  my $xpbsmonrc = "/usr/lib/torque/xpbsmon/xpbsmonrc";
+}
+else {
+  my $xpbsmonrc = "/opt/pbs/lib/xpbsmon/xpbsmonrc";
+}
 
 my @lines = `cat $xpbsmonrc`;
 grep { s/ICON.*$/ICON;pbs_oscar;pbs_oscar;;;}/ } @lines;
