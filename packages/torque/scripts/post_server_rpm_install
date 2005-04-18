@@ -22,7 +22,7 @@ use strict;
 use Carp;
 use lib '/usr/lib/systeminstaller';
 use SystemInstaller::Machine;
-use OSCAR::Distro;
+use lib '$ENV{OSCAR_HOME}/lib/OSCAR/Distro.pm;
 
 ######################################################################
 #  Check to see if 'PBS Server' is running.  If not, then start it.  #
