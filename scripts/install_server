@@ -166,14 +166,19 @@ oscar_log_subsection("Refreshing services");
 my ($distn, $distv) = which_distro_server();
 
 if ( $distn eq 'debian' ) {
-  !system("/etc/init.d/nfs-common start") or croak("Couldn't start nfs"); 
+  system("/etc/init.d/nfs-common start") or croak("Couldn't start nfs"); 
   # do we have to start nfs-user-server or nfs-kernel-user?
 }
 else {
   !system("/etc/init.d/nfs start") or croak("Couldn't start nfs");
 }
 !system("exportfs -a") or croak("Couldn't refresh nfs exports");
-!system("/etc/init.d/sshd start") or croak("Couldn't start sshd");
+if ( $distn eq 'debian' ) {
+  system("/etc/init.d/ssh start") or croak("Couldn't start ssh");
+}
+else {
+  !system("/etc/init.d/sshd start") or croak("Couldn't start sshd");
+}
 !system("chkconfig --level 345 sshd on");
 !system("chkconfig --level 345 dhcpd on");
 !system("chkconfig --level 345 portmap on");
