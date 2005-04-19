@@ -12,6 +12,7 @@
 include $(top_srcdir)/dist/Makefile.options
 
 oscar_DATA		= \
+			debian-3.1-i386.rpmlist \
             		fedora-1-i386.rpmlist \
             		fedora-2-i386.rpmlist \
 			mandrake-8.2-i386.rpmlist \
