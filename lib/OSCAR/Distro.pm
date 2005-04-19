@@ -63,16 +63,24 @@ sub which_distro {
     my $version = "0.0";
     my $name = "UnknownLinux";
     foreach my $file (keys %$DISTROFILES) {
-        my $output = `rpm -q --qf '\%{VERSION}' -p $directory/$file*`;
-        if($output =~ /^([\w\.]+)/) {
-            $version = $1;
-            $name = $DISTROFILES->{$file};
-            last;
-        }
+	$_ = $DISTROFILES->{$file} eq 'debian' ?
+	  	`cat /etc/$file 2>/dev/null` :
+		`rpm -q --qf '\%{VERSION}' $file 2>/dev/null`;
+	if($?) {
+	  # Then the child had a bad exit, so the package is not here
+	  next;
+	}
+	$version = $_;
+	$name = $DISTROFILES->{$file};
+	last;
     }
     # special treatment for RHEL and clones
     if ($name eq "redhat" && $version =~ m/^3(WS|AS|WS)/) {
         $version = "3as";
+    }
+    if ($name eq "debian") {
+      m/(\d+).(.*)\n/;
+      $version = "$1.$2";
     }
     return (lc $name, lc $version);
 }
@@ -95,13 +103,15 @@ sub which_distro_server {
             # Then the child had a bad exit, so the package is not here
             next;
         }
-        $version = $output;
-        $name = $DISTROFILES->{$file};
-	if ($name eq "suse") { 
+	if ($output =~ /^([\w\.]+)/) {
+          $version = $output;
+          $name = $DISTROFILES->{$file};
+	  if ($name eq "suse") { 
 		$version = `cat /etc/SuSE-release | tail -1 | cut -d '=' -f 2 | cut -b 2-`;
 		chomp $version;
+	  }
+          last;
 	}
-        last;
     }
     # special treatment for RHEL and clones
     if ($name eq "redhat" && $version =~ m/^3(WS|AS|WS)/) {
