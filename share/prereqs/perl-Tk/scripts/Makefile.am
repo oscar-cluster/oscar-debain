@@ -11,6 +11,6 @@
 
 include $(top_srcdir)/dist/Makefile.options
 
-oscar_SCRIPTS		= setup setup.deb setup.rpm
+oscar_SCRIPTS		= setup
 
 EXTRA_DIST		= $(oscar_SCRIPTS)
