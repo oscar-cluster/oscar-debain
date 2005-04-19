@@ -22,20 +22,23 @@ my $perl_version = $Config{'version'};
 my ($distn, $distv) = which_distro_server();
 my $rpmdir = get_pkg_dir("$ENV{OSCAR_HOME}/share/prereqs/perl-Tk/media");
 
-opendir(DIR, "$rpmdir") || croak("Can't open $rpmdir for perl-Tk");
-my @rpmvers = grep{ !/^\./ && !/Makefile/ } readdir(DIR);
-#chomp @rpmvers;
-closedir DIR;
+if ($distn ne 'debian') { # maybe the package is in an online repository
+  opendir(DIR, "$rpmdir") || croak("Can't open $rpmdir for perl-Tk");
+  my @rpmvers = grep{ !/^\./ && !/Makefile/ } readdir(DIR);
+  #chomp @rpmvers;
+  closedir DIR;
 
-my $match = 0;
-foreach my $dir (@rpmvers) {
-  $perl_version =~ $dir;
-  if ( $& eq $dir ) {
-    $rpmdir = "$rpmdir/$dir";
-    $match = 1;
-    break;
+  my $match = 0;
+  foreach my $dir (@rpmvers) {
+    $perl_version =~ $dir;
+    if ( $& eq $dir ) {
+      $rpmdir = "$rpmdir/$dir";
+      $match = 1;
+      break;
+    }
   }
 }
+
 oscar_log_subsection("Checking to see if we need to install Perl-Tk\n");
 
 my $perl_tk_pkg = which_perltk_name ();
