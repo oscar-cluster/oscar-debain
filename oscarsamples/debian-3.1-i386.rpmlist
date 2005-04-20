@@ -1,3 +1,4 @@
+deboot ftp://ftp.uwsg.indiana.edu/linux/debian/ sarge
 python-4suite
 anacron
 arpwatch
