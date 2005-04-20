@@ -40,6 +40,7 @@ use OSCAR::Distro;
 use POSIX;
 use Carp;
 use OSCAR::Database;
+use Deb::Repository;
 
 # First of all, enforce that the user running this script is 'root'
 
@@ -188,6 +189,7 @@ if (! -d "/tftpboot/debian") {
     print("ERROR: the local Debian repository in the /tftpboot/debian directory does not exist.  You must create this repository running the script create_local_debian_repository.\n");
     die("Cannot continue");
 }
+#get_debian_packages ();
 
 # Ensure that the package scripts are executable (wizard_prep runs
 # some of them)
