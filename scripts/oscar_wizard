@@ -311,7 +311,7 @@ sub build_oscar_image {
 
     my $repository_dir;
     if ($distroname eq "debian") {
-    	$repository_dir = "/tftpboot/deb/sources.list";
+    	$repository_dir = "$ENV{OSCAR_HOME}/Deb/sources.list";
     }
     else {
     	$repository_dir = "/tftpboot/rpm";
