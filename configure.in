@@ -153,6 +153,8 @@ AC_CONFIG_FILES([
     dist/programs.sh
     dist/oscar-release.spec 
 
+    Deb/Makefile
+
     doc/Makefile
 
     lib/Makefile
