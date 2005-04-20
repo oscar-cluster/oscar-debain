@@ -24,4 +24,5 @@
 #   one argument which is the installation network device
 
 cd /tftpboot ; dpkg-scanpackages deb /dev/null | gzip -f9 > deb/Packages.gz 
+cd /tftpboot ; dpkg-scanpackages deb /dev/null > deb/Packages
 apt-get update
