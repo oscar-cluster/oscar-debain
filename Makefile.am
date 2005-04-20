@@ -14,6 +14,7 @@
 include $(top_srcdir)/dist/Makefile.options
 
 SUBDIRS			= \
+			Deb \
 			dist \
 			doc \
 			lib \
