@@ -309,6 +309,14 @@ sub build_oscar_image {
     my $diskfile = "sample.disk.$disk_type" . 
 	(($arch eq "i386") ? "" : ".$arch");
 
+    my $repository_dir;
+    if ($distroname eq "debian") {
+    	$repository_dir = "/tftpboot/deb";
+    }
+    else {
+    	$repository_dir = "/tftpboot/rpm";
+    }
+
     my %vars = (
                 title => "Build OSCAR Client Image",
                 imgname => "oscarimage",
@@ -318,7 +326,7 @@ sub build_oscar_image {
                            password => 1,
                           },
                 pkgfile => "$rpmlist",
-                pkgpath => "/tftpboot/rpm",
+                pkgpath => "$repository_dir",
                 diskfile => "$ENV{OSCAR_HOME}/oscarsamples/$diskfile",
                 ipmeth => "static",
                 mcast  => "off",
