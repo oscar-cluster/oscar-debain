@@ -277,15 +277,37 @@ parseCommandLine();
 die "ERROR: You must be 'root' to run this script.  Aborting" if ($< != 0);
 
 # Make sure that the 'ntp' package is installed, at least version 4
-open(CMD,'rpm -q ntp |');
-my $cmd_output = <CMD>;
-close CMD;
+# First of all, we check the distribution type (RPM based or Debian)
+my $distrib = "debian";
+$_ = `cat /etc/debian_version 2>/dev/null`;
+if($?) {
+  # Then the child had a bad exit, so the package is not here
+  my $distrib = "rpm_based";
+}
+# Then, we get the package version
+my $version = -1;
+if ($distrib eq "debian") {
+  $_=`dpkg --status ntp`;
+  # two ways to set a package number
+  m/Version: (\d+):(\d+).(.*)\n/;
+  if (length($2) > 0) {
+    $version=$2;
+  }
+  else {
+    m/Version: (\d+).(.*)\n/;
+    $version=$1;
+  }
+}
+else {
+  open(CMD,"rpm -q ntp |");
+  my $cmd_output = <CMD>;
+  close CMD;
+  if (length($cmd_output) <= 0) {
+    $version =~ /$package-(\d+)/;
+  }
+}
 
-die "ERROR: ntp package is not installed.  Aborting" if 
-  (length($cmd_output) <= 0);
-
-$cmd_output =~ /^ntp-(\d+)/;
-die "ERROR: ntp package is not at least version 4.  Aborting" if ($1 < 4);
+die "ERROR: ntp package is not at least version 4 or not installed.  Aborting" if ($version < 4);
 
 # Next, write out the new config file and the step-tickers file.
 writeConfigFile();
