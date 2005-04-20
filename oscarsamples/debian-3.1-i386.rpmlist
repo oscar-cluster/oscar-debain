@@ -94,7 +94,6 @@ newt-tcl
 libnewt-perl
 nfs-common
 nkf
-sldapd
 ssh
 openssl
 libpam0g
