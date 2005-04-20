@@ -1,4 +1,5 @@
 python-4suite
+dselect
 anacron
 arpwatch
 ash
@@ -105,7 +106,6 @@ perl
 pidentd
 libpopt0
 portmap
-postfix
 procmail
 procps
 psmisc
@@ -125,10 +125,8 @@ rsh-server
 rsync
 screen
 sed
-sendmail
 setserial
 slang1
-slocate
 strace
 sysklogd
 syslinux
@@ -149,7 +147,6 @@ usbutils
 util-linux
 vim-common
 vim
-fcron
 jwhois
 xinetd
 zlib1g
@@ -180,7 +177,6 @@ xfs
 xlibmesa-gl
 xlibmesa-glu
 xfonts-base
-xdm
 xfonts-75dpi
 twm
 xfonts-100dpi
