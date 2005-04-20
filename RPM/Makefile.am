@@ -1,0 +1,19 @@
+# -*- makefile -*-
+#
+# Copyright (c) 2004 The Board of Trustees of the University of Illinois.
+#		All rights reserved.
+# Copyright (c) 2002-2004 The Trustees of Indiana University.  
+#                         All rights reserved.
+# 
+# $Id$
+#
+# This file is part of the OSCAR distribution.  See license
+# information in the top-level directory.
+#
+
+#include $(top_srcdir)/dist/Makefile.options
+include ./Makefile.options
+
+oscar_SCRIPTS		= 
+
+EXTRA_DIST		= $(oscar_SCRIPTS)
