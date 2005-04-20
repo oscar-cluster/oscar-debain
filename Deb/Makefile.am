@@ -11,9 +11,9 @@
 # information in the top-level directory.
 #
 
-include $(top_srcdir)/dist/Makefile.options
+#include $(top_srcdir)/dist/Makefile.options
+include ./Makefile.options
 
-oscar_SCRIPTS		= \
-			Repository.pm
+oscar_SCRIPTS		= Repository.pm
 
 EXTRA_DIST		= $(oscar_SCRIPTS)
