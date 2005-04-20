@@ -21,6 +21,7 @@ use strict;
 use Carp;
 use lib '/usr/lib/systeminstaller';
 use SystemInstaller::Machine;
+use OSCAR::Distro;
 
 # Use Schwartzian transform to sort node names alphabetically and numerically.
 # Names w/o numeric suffix preceed those with numeric suffix.
@@ -35,7 +36,14 @@ sub sortnodes(@) {
 
 print "...updating mpich_server nodes file\n";
 
-my $nodes_file = "/opt/mpich-1.2.5.10-ch_p4-gcc/share/machines.LINUX";
+my ($distn, $distv) = which_distro_server();
+my $nodes_file;
+if ($distn eq "debian") {
+  $nodes_file = "/etc/mpich/machines.LINUX";
+}
+else {
+  $nodes_file = "/opt/mpich-1.2.5.10-ch_p4-gcc/share/machines.LINUX";
+}
 
 open(NODES, ">$nodes_file") or croak("config_server: could not open mpich's nodes file\n");
 
