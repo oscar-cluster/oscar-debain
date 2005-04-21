@@ -183,7 +183,7 @@ $ENV{LC_TIME} = "C";
 $ENV{PATH} = $ENV{PATH} .
     ':/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin';
 
-# Sanity check: ensure that /tftpboot/rpm exists
+# Sanity check: ensure that the local repository exists
 
 oscar_log_subsection("Quick sanity check for the local repository");
 check_local_repository ();
@@ -194,8 +194,8 @@ check_local_repository ();
 
 system("chmod 755 packages/*/scripts/*");
 
-# Check to see if rpms for tftp and/or tftp-server are installed.
-# If so, remove them because they conflict with the tftp-hpa rpm.
+# Check to see if packages for tftp and/or tftp-server are installed.
+# If so, remove them because they conflict with the tftp-hpa packages.
 foreach my $pkg ('tftp', 'tftp-server')
   {
     my $tftp_version = get_package_version ($pkg);
@@ -296,14 +296,6 @@ ERROR: Your \"DISPLAY\" environment variable is not set, probably
 indicating that you are not running in an X windows environment.
 OSCAR requires that you run the installer in an X windows environment.
 Aborting the install.\n");
-}
-
-# Check for 2 rpms 1 from each CD
-
-my @filesystem=glob("/tftpboot/rpm/filesystem*rpm");
-my @rsync=glob("/tftpboot/rpm/rsync*rpm");
-if ((scalar(@filesystem)==0) || (scalar(@rsync)==0)) {
-    die("RPMs missing in /tftpboot/rpm/ (did you copy all CDs?)");
 }
 
 # Now start the execution
