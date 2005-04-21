@@ -24,7 +24,7 @@ use strict;
 use vars qw($VERSION @EXPORT);
 use Carp;
 use base qw(Exporter);
-@EXPORT = qw(which_perlQt_name which_perltk_name get_pkg_dir get_package_version get_pkg_list_in_dir);
+@EXPORT = qw(which_perlQt_name which_perltk_name get_pkg_dir get_package_version get_pkg_list_in_dir remove_pkg);
 
 sub which_perlQt_name
 {
@@ -55,7 +55,9 @@ sub get_package_version # ($package) -> package name
   }
   else {
     m/Version: (\d+).(.*)\n/;
-    $version=$1;
+    if (length($1) > 0) {
+      $version=$1;
+    }
   }
   return $version;
 }
