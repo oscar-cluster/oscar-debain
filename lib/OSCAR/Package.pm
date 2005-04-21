@@ -44,8 +44,7 @@ use Carp;
              run_pkg_script_chroot rpmlist install_packages copy_pkgs 
              pkg_config_xml list_selected_packages getSelectionHash
              isPackageSelectedForInstallation getConfigurationValues
-             run_pkg_apitest_test copy_pkg get_package_version
-	     get_pkg_list_in_dir);
+             run_pkg_apitest_test copy_pkg);
 $VERSION = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
 # Trying to figure out the best way to set this.
@@ -942,51 +941,6 @@ sub getConfigurationValues # ($package) -> $valueshashref
     }
 
   return undef;
-}
-
-sub get_package_version # ($package) -> package name
-{
-  my $package = shift;
-  my $version = -1;
-
-  if ( $distro_name eq 'debian' ) {
-    $_=`dpkg --status $package`;
-    # two ways to set a package number	  
-    m/Version: (\d+):(\d+).(.*)\n/;
-    if (length($2) > 0) {
-      $version=$2;
-    }
-    else {
-      m/Version: (\d+).(.*)\n/;
-      $version=$1;
-    }
-  }
-  else {
-    open(CMD,"rpm -q $package |");
-    my $cmd_output = <CMD>;
-    close CMD;
-    if (length($cmd_output) <= 0) {
-      $version =~ /$package-(\d+)/;
-    }
-  }
-  return $version;
-}
-
-sub get_pkg_list_in_dir
-{
-  my $dir = shift;
-  my @pkgs;
-
-  opendir(DIR, "$dir") || croak("Can't open $dir");
-  if ( $distro_name eq 'debian' ) {
-    @pkgs = grep { /.deb/ } readdir(DIR);
-  }
-  else {
-    @pkgs = grep { /.rpm/ } readdir(DIR);
-  }
-  closedir DIR;
-
-  return @pkgs;
 }
 								      
 1;

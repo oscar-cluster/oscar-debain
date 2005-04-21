@@ -1,9 +1,7 @@
 # -*- makefile -*-
 #
-# Copyright (c) 2004 The Board of Trustees of the University of Illinois.
+# Copyright (c) 2005 INRIA.
 #		All rights reserved.
-# Copyright (c) 2002-2004 The Trustees of Indiana University.  
-#                         All rights reserved.
 # 
 # $Id$
 #
@@ -11,9 +9,10 @@
 # information in the top-level directory.
 #
 
-#include $(top_srcdir)/dist/Makefile.options
 include ./Makefile.options
 
-oscar_SCRIPTS		= Repository.pm
+oscar_SCRIPTS		= /
+			Repository.pm /
+			PkgInfo.pm
 
 EXTRA_DIST		= $(oscar_SCRIPTS)

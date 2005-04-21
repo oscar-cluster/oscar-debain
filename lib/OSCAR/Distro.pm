@@ -31,7 +31,7 @@ use strict;
 use vars qw($VERSION @EXPORT);
 use Carp;
 use base qw(Exporter);
-@EXPORT = qw(which_distro which_distro_server which_mysql_name get_pkg_dir which_perltk_name);
+@EXPORT = qw(which_distro which_distro_server which_mysql_name);
 
 $VERSION = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 
@@ -172,64 +172,5 @@ CASE: {
 
 }
 
-sub which_perltk_name 
-{
-  my $name;
-  my $version;
-  ($name, $version) = which_distro_server ();
-
-  CASE: {
-    # redhat
-    ($name eq "redhat") && do{
-      return "perl-Tk";
-      last CASE;
-    };
-
-    # rhas
-    ($name eq "rhas") && do{
-      return "perl-Tk";
-      last CASE;
-    };
-
-    # fedora
-    ($name eq "fedora") && do{
-      return "perl-Tk";
-      last CASE;
-    };
-
-    # mandrake
-    ($name eq "mandrake") && do{
-      return "perl-Tk";
-      last CASE;
-    };
-
-    # suse
-    ($name eq "suse") && do{
-      return "perl-Tk";
-      last CASE;
-    };
-
-    # debian
-    ($name eq "debian") && do{
-      return "perl-tk";
-      last CASE;
-    };
-  }
-}
-
-sub get_pkg_dir 
-{
-  my $dir = shift;
-  my $name;
-  my $version;
-
-  ($name, $version) = which_distro ();
-  if ($name eq "debian") {
-    return "$dir/Debs";
-  }
-  else {
-    return "$dir/RPMS";
-  }
-}
 
 1;
