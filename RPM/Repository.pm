@@ -1,4 +1,4 @@
-package Distro::PkgInfo;
+package Distro::Repository;
 
 #   $Id$
 
@@ -21,55 +21,19 @@ package Distro::PkgInfo;
 #
 
 use strict;
-use vars qw($VERSION @EXPORT);
-use Carp;
+use lib "$ENV{OSCAR_HOME}/lib";
+use OSCAR::Logger;
+use OSCAR::Distro;
+use OSCAR::Package;
+use vars qw(@EXPORT);
 use base qw(Exporter);
-@EXPORT = qw(which_perltk_name get_pkg_dir get_package_version get_pkg_list_in_dir);
+@EXPORT = qw(check_local_repository);
 
-sub which_perlQt_name
+sub check_local_repository
 {
-    return "perl-Qt";
-}
-
-sub which_perltk_name 
-{
-  return "perl-Tk";
-}
-
-sub get_pkg_dir 
-{
-  my $dir = shift;
-  return "$dir/RPM";
-}
-
-sub get_package_version # ($package) -> package name
-{
-  open(CMD,"rpm -q $package |");
-  my $cmd_output = <CMD>;
-  close CMD;
-  if (length($cmd_output) <= 0) {
-    $version =~ /$package-(\d+)/;
+  if (! -d "/tftpboot/rpm") {
+    print("ERROR: /tftpboot/rpm directory does not exist.  You must create this directory\nand copy all of your distro RPMs there before running install_cluster.\n");
+    die("Cannot continue");
   }
 }
 
-sub get_pkg_list_in_dir
-{
-  my $dir = shift;
-  my @pkgs;
-
-  opendir(DIR, "$dir") || croak("Can't open $dir");
-  @pkgs = grep { /.rpm/ } readdir(DIR);
-  
-  closedir DIR;
-
-  return @pkgs;
-}
-
-sub remove_pkg 
-{
-    my $pkg = shift;
-    system ("dpkg -e $pkg\n") or die ("Impossible to remove the package $pkg");
-}
-
-
-1;

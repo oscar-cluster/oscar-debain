@@ -24,7 +24,12 @@ use strict;
 use vars qw($VERSION @EXPORT);
 use Carp;
 use base qw(Exporter);
-@EXPORT = qw(which_perltk_name get_pkg_dir get_package_version get_pkg_list_in_dir);
+@EXPORT = qw(which_perlQt_name which_perltk_name get_pkg_dir get_package_version get_pkg_list_in_dir);
+
+sub which_perlQt_name
+{
+    return "libqt-perl";
+}
 
 sub which_perltk_name 
 {
@@ -66,6 +71,12 @@ sub get_pkg_list_in_dir
   closedir DIR;
 
   return @pkgs;
+}
+
+sub remove_pkg 
+{
+    my $pkg = shift;
+    system ("apt-get remove $pkg\n") or die ("Impossible to remove the package $pkg");
 }
 
 1;
