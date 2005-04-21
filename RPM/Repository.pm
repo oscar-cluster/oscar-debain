@@ -35,5 +35,12 @@ sub check_local_repository
     print("ERROR: /tftpboot/rpm directory does not exist.  You must create this directory\nand copy all of your distro RPMs there before running install_cluster.\n");
     die("Cannot continue");
   }
+
+  # Check for 2 rpms 1 from each CD
+  my @filesystem=glob("/tftpboot/rpm/filesystem*rpm");
+  my @rsync=glob("/tftpboot/rpm/rsync*rpm");
+  if ((scalar(@filesystem)==0) || (scalar(@rsync)==0)) {
+    die("RPMs missing in /tftpboot/rpm/ (did you copy all CDs?)");
+  }     
 }
 
