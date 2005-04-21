@@ -37,6 +37,8 @@ use lib cwd() . "/lib";
 use vars qw($VERSION);
 use OSCAR::Logger;
 use OSCAR::Distro;
+use Distro::Repository;
+use Distro::PkgInfo;
 use POSIX;
 use Carp;
 use OSCAR::Database;

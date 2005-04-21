@@ -12,6 +12,7 @@
 include ./Makefile.options
 
 oscar_SCRIPTS		= /
+			Repository.pm /
 			PkgInfo.pm
 
 EXTRA_DIST		= $(oscar_SCRIPTS)
