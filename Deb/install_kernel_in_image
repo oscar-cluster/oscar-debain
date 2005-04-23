@@ -43,29 +43,13 @@ echo "  DEFAULTBOOT /boot/vmlinuz" >> $HDMOUNTPT/etc/systemconfig/systemconfig.c
 mkdir -p $HDMOUNTPT/boot/grub
 echo "boot=/dev/hda
 default=0
-timeout=1
+timeout=5
 
 title Debian Testing 
   root (hd0,0)
   kernel /vmlinuz ro root=/dev/hda6 vga=769
   initrd /initrd.img
 " > $HDMOUNTPT/boot/grub/menu.lst
-
-
-#echo "lba32
-#boot=/dev/hda
-#root=/dev/hda6
-#install=/boot/boot-menu.b
-#map=/boot/map
-#delay=2
-#timeout=4
-#vga=normal
-#default=Linux
-#image=/vmlinuz
-#  label=Linux
-#  read-only
-#  initrd=/initrd.img
-#" > $HDMOUNTPT/etc/lilo.conf
 
 #chroot $HDMOUNTPT lilo
 
