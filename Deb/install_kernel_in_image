@@ -1,0 +1,45 @@
+#!/bin/bash 
+HDPARTITION=/dev/hda1
+HDMOUNTPT=$1
+VERSION=sarge
+DEBSTATUS=testing
+HASPCMCIA=yes
+WANTX=yes
+
+# mount proc
+# chroot $HDMOUNTPT mount -t proc proc /proc
+
+mkdir -p $HDMOUNTPT/etc/mkinitrd
+echo "MODULES=most
+DELAY=0
+ROOT=$HDPARTITION
+UMASK=022
+MKIMAGE='mkcramfs %s %s > /dev/null'
+BUSYBOX=no
+PKGSCRIPTS=yes
+INITRD_LD_LIBRARY_PATH=\$LD_LIBRARY_PATH
+" > $HDMOUNTPT/etc/mkinitrd/mkinitrd.conf
+echo "do_initrd = Yes" > $HDMOUNTPT/etc/kernel-img.conf
+
+# add kernel
+chroot $HDMOUNTPT apt-get update
+chroot $HDMOUNTPT apt-get install kernel-image-2.4-686
+chroot $HDMOUNTPT apt-get -y install discover
+
+# with oscar, the boot partition is on the first partition
+# so we copy the kernel and the initrd file in boot to have
+# a generic config of grub
+cp -f $HDMOUNTPT/vmlinuz $HDMOUNTPT/boot
+cp -f $HDMOUNTPT/initrd.img $HDMOUNTPT/boot
+
+mkdir -p $HDMOUNTPT/boot/grub
+echo "#boot=/dev/hda
+default=0
+#timeout=10
+splashimage=(hd0,0)/grub/splash.xpm.gz
+
+title Debian Testing (2.6.10)
+  root (hd0,0)
+  kernel /vmlinuz ro root=/dev/hda6
+  initrd /initrd.img
+" > $HDMOUNTPT/boot/grub/menu.lst

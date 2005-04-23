@@ -12,7 +12,9 @@
 include ./Makefile.options
 
 oscar_SCRIPTS		= \
+			sources.list \
 			Repository.pm \
-			PkgInfo.pm
+			PkgInfo.pm \
+			install_kernel_in_image
 
 EXTRA_DIST		= $(oscar_SCRIPTS)
