@@ -1,4 +1,5 @@
 python-4suite
+lilo
 dselect
 anacron
 arpwatch
@@ -76,7 +77,6 @@ ltrace
 lvm2
 m4
 mime-support
-mailx
 make
 makedev
 man
@@ -181,3 +181,8 @@ xfonts-75dpi
 twm
 xfonts-100dpi
 xterm
+systemconfigurator
+exim4
+exim4-config-2
+exim4-base
+exim4-daemon-light
