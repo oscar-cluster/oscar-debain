@@ -30,6 +30,7 @@ use File::Basename;
 use AppConfig;
 use OSCAR::Network;
 use OSCAR::Package;
+use OSCAR::Distro;
 use OSCAR::Logger;
 use Cwd;
 
@@ -53,6 +54,12 @@ sync_user_files($targetdir) or croak("Couldn't sync user files");
 
 oscar_log_subsection("post_rpm_install: Running ssh setup");
 !system("./ssh_install $targetdir") or croak("Couldn't generate ssh keys");
+
+# For Debian we need now to install a kernel in the image
+my ($distro_name, $distro_version) = which_distro_server();
+if ($distro_name eq "debian") {
+  system ("../Distro/install_kernel_in_image $targetdir");
+}
 
 # Here we run all the post_rpm_install scripts
 
