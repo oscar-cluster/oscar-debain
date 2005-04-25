@@ -29,7 +29,8 @@ chroot $HDMOUNTPT adduser --disabled-login --disabled-password --force-badname D
 # add kernel
 chroot $HDMOUNTPT apt-get update
 chroot $HDMOUNTPT apt-get install kernel-image-2.6-686
-chroot $HDMOUNTPT apt-get -y install discover grub
+chroot $HDMOUNTPT apt-get -y install discover grub lilo
+chroot $HDMOUNTPT apt-get clean
 
 # with oscar, the boot partition is on the first partition
 # so we copy the kernel and the initrd file in boot to have
@@ -38,19 +39,18 @@ cp -f $HDMOUNTPT/vmlinuz $HDMOUNTPT/boot
 cp -f $HDMOUNTPT/initrd.img $HDMOUNTPT/boot
 
 # We need to update a config file for systemconfig
-echo "  DEFAULTBOOT /boot/vmlinuz" >> $HDMOUNTPT/etc/systemconfig/systemconfig.conf
+echo "CONFIGBOOT = YES
+CONFIGRD = YES
 
-mkdir -p $HDMOUNTPT/boot/grub
-echo "boot=/dev/hda
-default=0
-timeout=5
-
-title Debian Testing 
-  root (hd0,0)
-  kernel /vmlinuz ro root=/dev/hda6 vga=769
-  initrd /initrd.img
-" > $HDMOUNTPT/boot/grub/menu.lst
-
-#chroot $HDMOUNTPT lilo
+[BOOT]
+	ROOTDEV = /dev/hda6
+	BOOTDEV = /dev/hda1
+	DEFAULTBOOT = Linux
+	
+[KERNEL0]
+	PATH = /boot/vmlinuz
+	INITRD = /boot/initrd.img
+	LABEL = Linux
+" > $HDMOUNTPT/etc/systemconfig/systemconfig.conf
 
 chroot $HDMOUNTPT umount /proc
