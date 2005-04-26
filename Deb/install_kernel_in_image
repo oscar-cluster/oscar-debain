@@ -22,9 +22,10 @@ INITRD_LD_LIBRARY_PATH=\$LD_LIBRARY_PATH
 " > $HDMOUNTPT/etc/mkinitrd/mkinitrd.conf
 echo "do_initrd = Yes" > $HDMOUNTPT/etc/kernel-img.conf
 
-# I don't know why we have to create such a stupid user to
-# install a kernel package!
-chroot $HDMOUNTPT adduser --disabled-login --disabled-password --force-badname Debian-exim
+# I don't know why we have to create such a stupid group to
+# install a kernel package (even the group name is not compliant
+# with standard rules)!
+chroot $HDMOUNTPT addgroup --force-badname Debian-exim
 
 # add kernel
 chroot $HDMOUNTPT apt-get update
@@ -44,7 +45,7 @@ CONFIGRD = YES
 
 [BOOT]
 	ROOTDEV = /dev/hda6
-	BOOTDEV = /dev/hda1
+	BOOTDEV = /dev/hda
 	DEFAULTBOOT = Linux
 	
 [KERNEL0]
