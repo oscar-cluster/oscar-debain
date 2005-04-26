@@ -71,4 +71,9 @@ sub check_local_repository
     print("ERROR: the local Debian repository in the /tftpboot/debian directory does not exist.  You must create this repository running the script create_local_debian_repository.\n");
   die("Cannot continue");
   }
+
+  # Install a set of packages needed on the head node
+  system ("apt-get -y install daemon dhcp");
+  # OSCAR use the file /etc/init.d/dhcpd instead of /etc/init.d/dhcp on debian, so we create a link
+  system ("ln -s /etc/init.d/dhcp /etc/init.d/dhcpd");
 }
