@@ -29,7 +29,7 @@ chroot $HDMOUNTPT addgroup --force-badname Debian-exim
 
 # add kernel
 chroot $HDMOUNTPT apt-get update
-chroot $HDMOUNTPT apt-get install kernel-image-2.6-686
+chroot $HDMOUNTPT apt-get -y install kernel-image-2.6-686
 chroot $HDMOUNTPT apt-get -y install discover grub lilo
 chroot $HDMOUNTPT apt-get clean
 
