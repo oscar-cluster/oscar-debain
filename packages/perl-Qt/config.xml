@@ -106,4 +106,9 @@
       <rpm>perl-Qt-qt3-compat</rpm>
   </rpmlist>
 
+  <rpmlist>
+    <filter distribution='debian' group='oscar_server'/>
+      <rpm>libqt-perl</rpm>
+  </rpmlist>
+
 </oscar>
